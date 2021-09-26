@@ -5,19 +5,36 @@
  */
 package view.frames;
 
+import controller.Controller;
+import model.privileges.Privileges;
+
 /**
  *
  * @author conde
  */
 public class ReportsDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form ReportsDialog
-     */
-    public ReportsDialog(java.awt.Frame parent, boolean modal) {
+
+	private static ReportsDialog reportsDialog;
+	private Controller controller;
+	
+    private ReportsDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
+    
+    public static ReportsDialog getInstance(java.awt.Frame parent, boolean modal) {
+    	
+    	if(reportsDialog == null) {
+    		reportsDialog = new ReportsDialog(parent, modal);
+    	}
+    	
+    	return reportsDialog;
+    }
+    
+	public void setController(Controller controller) {
+		this.controller = controller;
+	}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -60,7 +77,7 @@ public class ReportsDialog extends javax.swing.JDialog {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE))
         );
 
-        tabbedPaneReports.addTab("Entrada y salida de vehículos", jPanel1);
+        tabbedPaneReports.addTab("Entrada y salida de vehiculos", jPanel1);
 
         cashRegisterCollectionTxtArea.setBackground(new java.awt.Color(44, 47, 51));
         cashRegisterCollectionTxtArea.setColumns(20);
@@ -81,11 +98,12 @@ public class ReportsDialog extends javax.swing.JDialog {
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE))
         );
 
-        tabbedPaneReports.addTab("Recaudación de caja", jPanel2);
+        tabbedPaneReports.addTab("Recaudacion de caja", jPanel2);
 
         btnSaveFile.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         btnSaveFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/save_file_icon.png"))); // NOI18N
         btnSaveFile.setText("  Archivar  ");
+        btnSaveFile.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -121,4 +139,18 @@ public class ReportsDialog extends javax.swing.JDialog {
     private javax.swing.JTabbedPane tabbedPaneReports;
     private javax.swing.JTextArea vehiclesEntryTxtArea;
     // End of variables declaration//GEN-END:variables
+
+	public void setPrivileges(String userName) {
+		if (userName.equals(Privileges.ADMINISTRATOR.toString().toLowerCase())) {
+
+			btnSaveFile.setEnabled(true);
+
+		} else if (userName.equals(Privileges.USER.toString().toLowerCase())) {
+
+			btnSaveFile.setEnabled(false);
+
+		}
+		
+	}
+
 }

@@ -17,13 +17,13 @@ public class CreateXMLFiles {
             File parkedVehiclesFile = xmlFiles.createFile(XMLFilesGenerator.PARKED_VEHICLES_FILE_NAME);
 
             XMLUserElementsGenerator xmlDataUser;
-            XMLSpotElementsGenerator xmlDataSpots;
+            XMLParkingLotsElementsGenerator xmlDataSpots;
         try {
             xmlDataUser = new XMLUserElementsGenerator();
             xmlDataUser.generateDocument();
             xmlDataUser.generateXML(usersFile);
             
-            xmlDataSpots = new XMLSpotElementsGenerator();
+            xmlDataSpots = new XMLParkingLotsElementsGenerator();
             xmlDataSpots.generateDocument();
             xmlDataSpots.generateXML(parkedVehiclesFile);
             

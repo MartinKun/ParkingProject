@@ -78,7 +78,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener{
         tablePanel = new javax.swing.JPanel();
         rightPanel = new javax.swing.JPanel();
         borderTopRightPanel = new javax.swing.JPanel();
-        detailContainer = new DetailPanel();
+        detailContainer = DetailPanel.getInstance();
         bottomPanel = new javax.swing.JPanel();
         parkingLotStatusInfoLbl = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
@@ -98,10 +98,13 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener{
         btnChangePrice.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnChangePrice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/change_price_icon.png"))); // NOI18N
         btnChangePrice.setText("Cambiar Tarifa");
+        btnChangePrice.setEnabled(false);
 
         btnSeeReports.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnSeeReports.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/reports_icon.png"))); // NOI18N
         btnSeeReports.setText(" Ver Reportes   ");
+        btnSeeReports.addActionListener(this);
+        btnSeeReports.setEnabled(false);
 
         priceInfoLbl.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
         priceInfoLbl.setForeground(new java.awt.Color(255, 255, 255));
@@ -501,27 +504,30 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener{
 
 		if (userName.equals(Privileges.ADMINISTRATOR.toString().toLowerCase())) {
 
-			System.out.println("Privilegios administrador");
-			logoutMenuItem.setEnabled(true);
+			btnChangePrice.setEnabled(true);
+			btnSeeReports.setEnabled(true);
 
 		} else if (userName.equals(Privileges.USER.toString().toLowerCase())) {
 
 			System.out.println("Privilegios usuario");
+			btnSeeReports.setEnabled(true);
 
 		}
 
 	}
 
-	public void restartPrivileges() {
-		logoutMenuItem.setEnabled(false);
+	public void restartValues() {
+		btnChangePrice.setEnabled(false);
+		btnSeeReports.setEnabled(false);
 	}
     
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
 		if (evt.getSource() == logoutMenuItem.getComponent()) {
-			restartPrivileges();
 			controller.logout();
+		} else if (evt.getSource() == btnSeeReports) {
+			controller.openReportsDialog();
 		}
 		
 	}

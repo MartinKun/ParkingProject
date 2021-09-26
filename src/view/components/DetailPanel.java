@@ -14,6 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import controller.Controller;
+import model.privileges.Privileges;
+
 /**
  *
  * @author conde
@@ -31,8 +34,13 @@ public class DetailPanel extends JPanel {
     javax.swing.JSeparator separator;
     JButton btnGenerateTicket;
     JButton btnRemoveVehicle;
+    
+    Controller controller;
+    
+    private static DetailPanel detailPanel;
+   
 
-    public DetailPanel() {
+    private DetailPanel() {
         setLayout(null);
         this.setBounds(0, 0, 300, 536);
         this.setMaximumSize(new Dimension(300,620));
@@ -40,6 +48,20 @@ public class DetailPanel extends JPanel {
 
         init();
     }
+    
+    public static DetailPanel getInstance() {
+    	
+    	if(detailPanel == null) {
+    		detailPanel = new DetailPanel();
+    	}
+    	
+    	return detailPanel;
+    }
+    
+	public void setController(Controller controller) {
+		this.controller = controller;
+		
+	}
 
     private void init() {
 
@@ -62,7 +84,7 @@ public class DetailPanel extends JPanel {
         this.add(pLotLabel);
         
         vehicleLbl = new JLabel();
-        vehicleLbl.setText("Vehículo");
+        vehicleLbl.setText("Vehiculo");
         vehicleLbl.setHorizontalAlignment((int) CENTER_ALIGNMENT);
         vehicleLbl.setBounds(0 + 10, pLotLabel.getY() + pLotLabel.getHeight(), this.getWidth() - 20, 40);
         vehicleLbl.setFont(new Font("Verdana", Font.PLAIN, 16));
@@ -104,7 +126,26 @@ public class DetailPanel extends JPanel {
         btnRemoveVehicle.setFont(new Font("Verdana", Font.BOLD, 16));
         btnRemoveVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("../../resources/images/delete_car.png")));
         btnRemoveVehicle.setVisible(false);
+        
         this.add(btnRemoveVehicle);
     }
+    
+	public void setPrivileges(String userName) {
+		
+		if (userName.equals(Privileges.ADMINISTRATOR.toString().toLowerCase())) {
+
+			btnRemoveVehicle.setVisible(true);;
+
+		} else if (userName.equals(Privileges.USER.toString().toLowerCase())) {
+
+			btnRemoveVehicle.setVisible(false);
+
+		}
+		
+	}
+	
+	public void restartValues() {
+		btnRemoveVehicle.setVisible(false);
+	}
 
 }

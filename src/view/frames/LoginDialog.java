@@ -193,6 +193,9 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 			if (!response.equals("")) {
 				resetFields();
 				controller.setPrivileges(response);
+				controller.buildVehicleTable();
+				controller.buildParkingLotComboBox();
+				controller.buildSketch();
 			}
 
 		}

@@ -11,7 +11,7 @@ public class XMLFilesGenerator {
 	public static final String USERS_FILE_NAME = "users.xml";
         public static final String PARKED_VEHICLES_FILE_NAME = "parked_vehicles.xml";
 	
-	private String getActualDirectory() {
+	private static String getActualDirectory() {
 		File file = new File("./src/xmlsrc");
 		String actualDirectory = "";
 		try {
@@ -20,6 +20,16 @@ public class XMLFilesGenerator {
 			e.printStackTrace();
 		}
 		return actualDirectory;
+	}
+	
+	public static String getUsersFilePath() {
+		
+		return getActualDirectory() + "\\" + USERS_FILE_NAME;
+	}
+	
+	public static String getParkedVehiclesFilePath() {
+		
+		return getActualDirectory() + "\\" + PARKED_VEHICLES_FILE_NAME;
 	}
 
 	// If the file does not exist in 'db' directory, this method creates it.

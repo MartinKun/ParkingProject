@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 public class User {
 	
-	String privilege;
+	private String privilege;
 	private String username;
 	private String password;
 

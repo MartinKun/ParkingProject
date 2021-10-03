@@ -10,13 +10,7 @@ import model.entity.User;
 
 public class LoginLogic {
 
-	UserDao userDao;
-
-	private Controller controller;
-
-	public void setController(Controller controller) {
-		this.controller = controller;
-	}
+	private UserDao userDao;
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;

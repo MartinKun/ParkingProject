@@ -32,16 +32,16 @@ public class XMLParkingLotsElementsGenerator extends DOMGenerator {
             Element admissionHour = document.createElement("admission_hour");
 
             parkingLots.appendChild(parkingLot);
-            parkingLot.setAttribute("parking_lot", (i+1) + "");
+            parkingLot.setAttribute("spot", (i+1) + "");
             parkingLot.appendChild(vehicleType);
             parkingLot.appendChild(vehiclePlate);
             parkingLot.appendChild(admissionDate);
             parkingLot.appendChild(admissionHour);
             
-            vehicleType.appendChild(document.createTextNode("empty"));
-            vehiclePlate.appendChild(document.createTextNode("empty"));
-            admissionDate.appendChild(document.createTextNode("empty"));
-            admissionHour.appendChild(document.createTextNode("empty"));
+            vehicleType.appendChild(document.createTextNode("-"));
+            vehiclePlate.appendChild(document.createTextNode("-"));
+            admissionDate.appendChild(document.createTextNode("-"));
+            admissionHour.appendChild(document.createTextNode("-"));
         }
     }
 }

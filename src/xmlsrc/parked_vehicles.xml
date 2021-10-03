@@ -1,99 +1,99 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <parking_lots>
-    <parking_lot parking_lot="1">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="1">
+        <admission_date>03/10/2021</admission_date>
+        <admission_hour>01:59:35</admission_hour>
+        <plate>GH 765 YT</plate>
+        <vehicle>Motocicleta</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="2">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="2">
+        <admission_date>03/10/2021</admission_date>
+        <admission_hour>13:36:52</admission_hour>
+        <plate>ABC 7896</plate>
+        <vehicle>Automovil</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="3">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="3">
+        <admission_date>03/10/2021</admission_date>
+        <admission_hour>01:56:15</admission_hour>
+        <plate>AB 678 TY</plate>
+        <vehicle>Automovil</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="4">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="4">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="5">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="5">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="6">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="6">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="7">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="7">
+        <admission_date>03/10/2021</admission_date>
+        <admission_hour>01:59:24</admission_hour>
+        <plate>TH 678 UY</plate>
+        <vehicle>Automovil</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="8">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="8">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="9">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="9">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="10">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="10">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="11">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="11">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="12">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="12">
+        <admission_date>03/10/2021</admission_date>
+        <admission_hour>11:47:38</admission_hour>
+        <plate>TH 786 RE</plate>
+        <vehicle>Automovil</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="13">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="13">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="14">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="14">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="15">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="15">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
-    <parking_lot parking_lot="16">
-        <vehicle>empty</vehicle>
-        <plate>empty</plate>
-        <admission_date>empty</admission_date>
-        <admission_hour>empty</admission_hour>
+    <parking_lot spot="16">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
     </parking_lot>
 </parking_lots>

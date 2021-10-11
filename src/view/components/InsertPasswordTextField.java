@@ -9,7 +9,9 @@ import javax.swing.JPasswordField;
 
 public class InsertPasswordTextField extends JPasswordField implements IConfigureTextField, KeyListener, FocusListener {
 
-    private final int CHAR_LIMIT = 10;
+	private static final long serialVersionUID = 1L;
+	
+	private final int CHAR_LIMIT = 10;
 
     public InsertPasswordTextField() {
         addKeyListener(this);

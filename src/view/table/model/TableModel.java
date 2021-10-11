@@ -4,6 +4,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class TableModel extends DefaultTableModel {
 
+	private static final long serialVersionUID = 1L;
 	String[] titles;
 	Object[][] data;
 
@@ -21,9 +22,10 @@ public class TableModel extends DefaultTableModel {
 	}
 
 	public TableModel() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
+	@Override
 	public boolean isCellEditable(int row, int column) {
 		return false;
 

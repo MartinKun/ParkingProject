@@ -6,17 +6,14 @@
 package view.frames;
 
 import controller.Controller;
-import sun.rmi.runtime.Log;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
-import application.Main;
 import view.components.InsertPasswordTextField;
 import view.components.InsertUserTextField;
 
@@ -26,7 +23,8 @@ import view.components.InsertUserTextField;
  */
 public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
-	// Variables declaration - do not modify//GEN-BEGIN:variables
+	private static final long serialVersionUID = 1L;
+	
 	private javax.swing.JButton btnLogin;
 	private javax.swing.JLabel logoParkingLabel;
 	private javax.swing.JPanel loginPane;
@@ -42,6 +40,7 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
 	public LoginDialog(java.awt.Frame parent, boolean modal) {
 		super(parent, modal);
+		setAlwaysOnTop(true);
 		initComponents();
 		setTitle("Login");
 		setLocationRelativeTo(null);
@@ -51,7 +50,7 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
 	/* Method to close the program when the JDialog Close button is clicked */
 	public void close() {
-		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -76,7 +75,7 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
 		userJField.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 		userJField.setForeground(new java.awt.Color(153, 153, 153));
-		userJField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+		userJField.setHorizontalAlignment(SwingConstants.CENTER);
 		userJField.setText("username");
 		userJField.setToolTipText("");
 		userJField.setBorder(null);
@@ -98,7 +97,7 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
 		passwordField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 		passwordField.setForeground(new java.awt.Color(153, 153, 153));
-		passwordField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+		passwordField.setHorizontalAlignment(SwingConstants.CENTER);
 		passwordField.setText("password");
 		passwordField.setBorder(null);
 		passwordField.setOpaque(false);
@@ -193,9 +192,8 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 			if (!response.equals("")) {
 				resetFields();
 				controller.setPrivileges(response);
-				controller.buildVehicleTable();
-				controller.buildParkingLotComboBox();
-				controller.buildSketch();
+				controller.initData();
+				
 			}
 
 		}

@@ -8,8 +8,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import controller.Controller;
-import model.entity.User;
-import model.entity.Users;
+import model.domain.User;
+import model.domain.Users;
 import xmlsrc.XMLFilesGenerator;
 
 public class UserDao implements IUserDao {

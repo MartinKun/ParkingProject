@@ -13,18 +13,19 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import controller.Controller;
-import model.entity.ParkingLot;
+import model.ParkingLotsObserver;
+import model.PriceObserver;
+import model.SelectParkingLotObserver;
+import model.domain.ImageIcons;
+import model.domain.ParkingLot;
 import model.privileges.Privileges;
 import view.components.CustomPaintedPanel;
 import view.components.DetailPanel;
@@ -32,17 +33,15 @@ import view.components.EnterVehiclePlateTextField;
 import view.components.ParkingLotLabel;
 import view.table.view.TablePanel;
 
-/**
- *
- * @author conde
- */
-public class MainFrame extends javax.swing.JFrame implements ActionListener, MouseListener {
+public class MainFrame extends javax.swing.JFrame
+		implements ActionListener, ParkingLotsObserver, SelectParkingLotObserver, PriceObserver {
 
+
+	private static final long serialVersionUID = 1L;
+	
 	private Dimension sizeWindow;
 	private Rectangle window;
 	private Controller controller;
-
-	private String availableSpotsNumber;
 
 	private javax.swing.JMenuItem aboutMenuItem;
 	private javax.swing.JPanel borderTopRightPanel;
@@ -62,22 +61,23 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 	private javax.swing.JPanel mainPanel;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JPanel middlePanel;
-	private javax.swing.JLabel pLot1;
-	private javax.swing.JLabel pLot10;
-	private javax.swing.JLabel pLot11;
-	private javax.swing.JLabel pLot12;
-	private javax.swing.JLabel pLot13;
-	private javax.swing.JLabel pLot14;
-	private javax.swing.JLabel pLot15;
-	private javax.swing.JLabel pLot16;
-	private javax.swing.JLabel pLot2;
-	private javax.swing.JLabel pLot3;
-	private javax.swing.JLabel pLot4;
-	private javax.swing.JLabel pLot5;
-	private javax.swing.JLabel pLot6;
-	private javax.swing.JLabel pLot7;
-	private javax.swing.JLabel pLot8;
-	private javax.swing.JLabel pLot9;
+	private ParkingLotLabel pLot1;
+	private ParkingLotLabel pLot10;
+	private ParkingLotLabel pLot11;
+	private ParkingLotLabel pLot12;
+	private ParkingLotLabel pLot13;
+	private ParkingLotLabel pLot14;
+	private ParkingLotLabel pLot15;
+	private ParkingLotLabel pLot16;
+	private ParkingLotLabel pLot2;
+	private ParkingLotLabel pLot3;
+	private ParkingLotLabel pLot4;
+	private ParkingLotLabel pLot5;
+	private ParkingLotLabel pLot6;
+	private ParkingLotLabel pLot7;
+	private ParkingLotLabel pLot8;
+	private ParkingLotLabel pLot9;
+	private ArrayList<ParkingLotLabel> arrayParkingLotLabels;
 	private javax.swing.JLabel parkingLotLbl;
 	private javax.swing.JLabel parkingLotStatusInfoLbl;
 	private javax.swing.JLabel priceInfoLbl;
@@ -88,23 +88,8 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 	private javax.swing.JPanel tablePanelContainer;
 	private javax.swing.JTextField vPlateNumberTextField;
 
-	ImageIcon emptySpotIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/parkinglot.png"));
-	ImageIcon carIcon = new javax.swing.ImageIcon(getClass().getResource("../../resources/images/car.png"));
-	ImageIcon motorcycleIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/motorcycle.png"));
-	ImageIcon carMouseOverIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/car-mouseover.png"));
-	ImageIcon motorcycleMouseOverIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/motorcycle-mouseover.png"));
-	ImageIcon parkingLotMouseOverIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/parkinglot-mouseover.png"));
-	ImageIcon carClickedIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/car-clicked.png"));
-	ImageIcon motorcycleClickedIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/motorcycle-clicked.png"));
-	ImageIcon parkingLotClickedIcon = new javax.swing.ImageIcon(
-			getClass().getResource("../../resources/images/parkinglot-clicked.png"));
+	ImageIcons imageIcons = new ImageIcons();
+
 	// End of variables declaration//GEN-END:variables
 
 	public MainFrame() {
@@ -116,11 +101,23 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 		setResizable(false);
 
 		initComponents();
+		close();
 	}
-
-	@SuppressWarnings("unchecked")
-	// <editor-fold defaultstate="collapsed" desc="Generated
-	// Code">//GEN-BEGIN:initComponents
+	
+	/* Method to close the program when the Frame Close button is clicked */
+	public void close() {
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				int resp = JOptionPane.showConfirmDialog(null, "Estas seguro que deseas salir del programa?");
+				if (JOptionPane.OK_OPTION == resp) {
+					System.exit(0);
+				}
+			}
+		});
+	}
+	
 	private void initComponents() {
 
 		mainContainerPanel = new javax.swing.JPanel();
@@ -139,38 +136,75 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 		middlePanel = new javax.swing.JPanel();
 		tabbedPaneContainer = new javax.swing.JTabbedPane();
 		sketchPanel = new CustomPaintedPanel("../../resources/images/sketch.png");
-		pLot12 = new JLabel();
-		pLot9 = new JLabel();
-		pLot14 = new JLabel();
-		pLot15 = new JLabel();
-		pLot13 = new JLabel();
-		pLot10 = new JLabel();
-		pLot11 = new JLabel();
-		pLot16 = new JLabel();
-		pLot7 = new JLabel();
-		pLot8 = new JLabel();
-		pLot1 = new JLabel();
-		pLot5 = new JLabel();
-		pLot4 = new JLabel();
-		pLot3 = new JLabel();
-		pLot2 = new JLabel();
-		pLot6 = new JLabel();
-		pLot1.addMouseListener(this);
-		pLot2.addMouseListener(this);
-		pLot3.addMouseListener(this);
-		pLot4.addMouseListener(this);
-		pLot5.addMouseListener(this);
-		pLot6.addMouseListener(this);
-		pLot7.addMouseListener(this);
-		pLot8.addMouseListener(this);
-		pLot9.addMouseListener(this);
-		pLot10.addMouseListener(this);
-		pLot11.addMouseListener(this);
-		pLot12.addMouseListener(this);
-		pLot13.addMouseListener(this);
-		pLot14.addMouseListener(this);
-		pLot15.addMouseListener(this);
-		pLot16.addMouseListener(this);
+		pLot12 = new ParkingLotLabel();
+		pLot9 = new ParkingLotLabel();
+		pLot14 = new ParkingLotLabel();
+		pLot15 = new ParkingLotLabel();
+		pLot13 = new ParkingLotLabel();
+		pLot10 = new ParkingLotLabel();
+		pLot11 = new ParkingLotLabel();
+		pLot16 = new ParkingLotLabel();
+		pLot7 = new ParkingLotLabel();
+		pLot8 = new ParkingLotLabel();
+		pLot1 = new ParkingLotLabel();
+		pLot5 = new ParkingLotLabel();
+		pLot4 = new ParkingLotLabel();
+		pLot3 = new ParkingLotLabel();
+		pLot2 = new ParkingLotLabel();
+		pLot6 = new ParkingLotLabel();
+
+		pLot1.addObserver(this);
+		pLot2.addObserver(this);
+		pLot3.addObserver(this);
+		pLot4.addObserver(this);
+		pLot5.addObserver(this);
+		pLot6.addObserver(this);
+		pLot7.addObserver(this);
+		pLot8.addObserver(this);
+		pLot9.addObserver(this);
+		pLot10.addObserver(this);
+		pLot11.addObserver(this);
+		pLot12.addObserver(this);
+		pLot13.addObserver(this);
+		pLot14.addObserver(this);
+		pLot15.addObserver(this);
+		pLot16.addObserver(this);
+
+		pLot1.setParkingLotNumber(1);
+		pLot2.setParkingLotNumber(2);
+		pLot3.setParkingLotNumber(3);
+		pLot4.setParkingLotNumber(4);
+		pLot5.setParkingLotNumber(5);
+		pLot6.setParkingLotNumber(6);
+		pLot7.setParkingLotNumber(7);
+		pLot8.setParkingLotNumber(8);
+		pLot9.setParkingLotNumber(9);
+		pLot10.setParkingLotNumber(10);
+		pLot11.setParkingLotNumber(11);
+		pLot12.setParkingLotNumber(12);
+		pLot13.setParkingLotNumber(13);
+		pLot14.setParkingLotNumber(14);
+		pLot15.setParkingLotNumber(15);
+		pLot16.setParkingLotNumber(16);
+
+		arrayParkingLotLabels = new ArrayList<>();
+		arrayParkingLotLabels.add(pLot1);
+		arrayParkingLotLabels.add(pLot2);
+		arrayParkingLotLabels.add(pLot3);
+		arrayParkingLotLabels.add(pLot4);
+		arrayParkingLotLabels.add(pLot5);
+		arrayParkingLotLabels.add(pLot6);
+		arrayParkingLotLabels.add(pLot7);
+		arrayParkingLotLabels.add(pLot8);
+		arrayParkingLotLabels.add(pLot9);
+		arrayParkingLotLabels.add(pLot10);
+		arrayParkingLotLabels.add(pLot11);
+		arrayParkingLotLabels.add(pLot12);
+		arrayParkingLotLabels.add(pLot13);
+		arrayParkingLotLabels.add(pLot14);
+		arrayParkingLotLabels.add(pLot15);
+		arrayParkingLotLabels.add(pLot16);
+
 		tablePanelContainer = new javax.swing.JPanel();
 		rightPanel = new javax.swing.JPanel();
 		borderTopRightPanel = new javax.swing.JPanel();
@@ -198,6 +232,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 				.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/change_price_icon.png"))); // NOI18N
 		btnChangePrice.setText("Cambiar Tarifa");
 		btnChangePrice.setEnabled(false);
+		btnChangePrice.addActionListener(this);
 
 		btnSeeReports.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 		btnSeeReports.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/reports_icon.png"))); // NOI18N
@@ -244,7 +279,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 		jPanel1.setMinimumSize(new java.awt.Dimension(1551, 100));
 		jPanel1.setPreferredSize(new java.awt.Dimension(1551, 250));
 
-		vPlateNumberTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+		vPlateNumberTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		vPlateNumberTextField.setBorder(null);
 
 		javax.swing.GroupLayout enterVPlatePanelLayout = new javax.swing.GroupLayout(enterVPlatePanel);
@@ -531,6 +566,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 		helpMenu.setText("Ayuda");
 
 		aboutMenuItem.setText("Acerca de");
+		aboutMenuItem.addActionListener(this);
 		helpMenu.add(aboutMenuItem);
 
 		menuBar.add(helpMenu);
@@ -549,44 +585,6 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String args[]) {
-		/* Set the Nimbus look and feel */
-		// <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
-		// (optional) ">
-		/*
-		 * If Nimbus (introduced in Java SE 6) is not available, stay with the default
-		 * look and feel. For details see
-		 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-		 */
-		try {
-			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-			java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		// </editor-fold>
-
-		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new MainFrame().setVisible(true);
-			}
-		});
-	}
-
 	public void setController(Controller controller) {
 		this.controller = controller;
 	}
@@ -601,8 +599,6 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 			btnSeeReports.setEnabled(true);
 
 		} else if (userName.equals(Privileges.USER.toString().toLowerCase())) {
-
-			System.out.println("Privilegios usuario");
 			btnSeeReports.setEnabled(true);
 
 		}
@@ -621,6 +617,8 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 			controller.logout();
 		} else if (evt.getSource() == btnSeeReports) {
 			controller.openReportsDialog();
+		} else if (evt.getSource() == btnChangePrice) {
+			controller.openChangePriceDialog();
 		} else if (evt.getSource() == btnEnterVehicle) {
 
 			String plateNumber = vPlateNumberTextField.getText().toUpperCase();
@@ -628,636 +626,95 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener, Mou
 			String parkingLot = choiceParkingLotComboBox.getSelectedItem().toString();
 
 			boolean response = controller.enterVehicle(plateNumber, vehicle, parkingLot);
-			controller.buildVehicleTable();
-			controller.buildParkingLotComboBox();
-			controller.buildSketch();
 
 			if (response) {
 				vPlateNumberTextField.setText("");
 			}
 
+		} else if (evt.getSource() == aboutMenuItem) {
+			controller.openAboutDialog();
 		}
 
 	}
 
-	public void buildParkingLotComboBox(ArrayList<ParkingLot> parkingLots) {
-		ArrayList<String> spotsArrayList = new ArrayList<>();
-		String[] availableSpots;
+	private void buildSketch(ArrayList<ParkingLot> parkingLots) {
 
-		for (ParkingLot parkingLot : parkingLots) {
+		for (int i = 0; i < parkingLots.size(); i++) {
 
-			if (parkingLot.getVehicle().equals("-")) {
-				spotsArrayList.add(parkingLot.getSpot() + "");
+			if (parkingLots.get(i).getVehicle().equals("-")) {
+				arrayParkingLotLabels.get(i).setIcon(imageIcons.getEmptySpotIcon());
+			} else if (parkingLots.get(i).getVehicle().equals("Automovil")) {
+				arrayParkingLotLabels.get(i).setIcon(imageIcons.getCarIcon());
+			} else if (parkingLots.get(i).getVehicle().equals("Motocicleta")) {
+				arrayParkingLotLabels.get(i).setIcon(imageIcons.getMotorcycleIcon());
 			}
+
 		}
 
-		availableSpots = new String[spotsArrayList.size()];
-		setAvailableSpotsMessage(spotsArrayList.size());
-		if (spotsArrayList.size() == 0) {
-			btnEnterVehicle.setEnabled(false);
-		} else {
-			btnEnterVehicle.setEnabled(true);
-		}
+	}
 
-		for (int i = 0; i < spotsArrayList.size(); i++) {
-			availableSpots[i] = spotsArrayList.get(i);
-		}
+	@Override
+	public void parkingLotsValueChange(ArrayList<ParkingLot> parkingLots) {
+
+		controller.buildVehicleTable(parkingLots);
+		buildSketch(parkingLots);
+
+	}
+
+	@Override
+	public void availableSpotsValueChange(String[] availableSpots) {
+		controller.buildAvailableSpotsMessage(availableSpots.length);
+		buildParkingLotComboBox(availableSpots);
+
+	}
+
+	public void buildParkingLotComboBox(String[] availableSpots) {
 
 		choiceParkingLotComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(availableSpots));
 
 	}
 
-	private void setAvailableSpotsMessage(int availableSpotsNumber) {
-		parkingLotStatusInfoLbl.setText("Lugares disponibles:  " + availableSpotsNumber + "");
-		parkingLotStatusInfoLbl.setForeground(new java.awt.Color(102, 204, 0));
-
-		if (availableSpotsNumber <= 3) {
-			parkingLotStatusInfoLbl.setForeground(new java.awt.Color(255, 51, 51));
-			if (availableSpotsNumber == 0) {
-				parkingLotStatusInfoLbl.setText("NO HAY MAS LUGAR");
-			}
-		}
-
+	public void setAvailableSpotsMessage(String availableSpotsMessage, Color color) {
+		parkingLotStatusInfoLbl.setText(availableSpotsMessage);
+		parkingLotStatusInfoLbl.setForeground(color);
 	}
 
-	public void buildSketch(ArrayList<ParkingLot> parkingLots) {
+	public void setEnableEnterVehicleButton(boolean isEnable) {
 
-		Map<ParkingLot, JLabel> mapSketchSpots = new HashMap<ParkingLot, JLabel>();
+		btnEnterVehicle.setEnabled(isEnable);
 
-		mapSketchSpots.put(parkingLots.get(0), pLot1);
-		mapSketchSpots.put(parkingLots.get(1), pLot2);
-		mapSketchSpots.put(parkingLots.get(2), pLot3);
-		mapSketchSpots.put(parkingLots.get(3), pLot4);
-		mapSketchSpots.put(parkingLots.get(4), pLot5);
-		mapSketchSpots.put(parkingLots.get(5), pLot6);
-		mapSketchSpots.put(parkingLots.get(6), pLot7);
-		mapSketchSpots.put(parkingLots.get(7), pLot8);
-		mapSketchSpots.put(parkingLots.get(8), pLot9);
-		mapSketchSpots.put(parkingLots.get(9), pLot10);
-		mapSketchSpots.put(parkingLots.get(10), pLot11);
-		mapSketchSpots.put(parkingLots.get(11), pLot12);
-		mapSketchSpots.put(parkingLots.get(12), pLot13);
-		mapSketchSpots.put(parkingLots.get(13), pLot14);
-		mapSketchSpots.put(parkingLots.get(14), pLot15);
-		mapSketchSpots.put(parkingLots.get(15), pLot16);
-
-		for (ParkingLot parkingLot : parkingLots) {
-			switch (parkingLot.getVehicle()) {
-			case "Automovil":
-				mapSketchSpots.get(parkingLot).setIcon(carIcon);
-				break;
-			case "Motocicleta":
-				mapSketchSpots.get(parkingLot).setIcon(motorcycleIcon);
-				break;
-			default:
-				mapSketchSpots.get(parkingLot).setIcon(emptySpotIcon);
-			}
-		}
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent evt) {
+	public void changeValueSelected(int parkingLotSelected) {
 
-		if (evt.getSource() == pLot1) {
+		controller.makeSameSelection(parkingLotSelected);
 
-			deselectItems();
-			if (pLot1.getIcon().equals(carMouseOverIcon)) {
-				pLot1.setIcon(carClickedIcon);
-			} else if (pLot1.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot1.setIcon(motorcycleClickedIcon);
-			} else if (pLot1.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot1.setIcon(parkingLotClickedIcon);
+	}
+
+	public void selectParkingLotLabel(int itemSelected) {
+
+		for (ParkingLotLabel label : arrayParkingLotLabels) {
+			if (label.getParkingLotNumber() != itemSelected) {
+				label.deselectIcon();
+			} else {
+				label.selectIcon();
 			}
+		}
 
-		} else if (evt.getSource() == pLot2) {
+	}
 
-			deselectItems();
-			if (pLot2.getIcon().equals(carMouseOverIcon)) {
-				pLot2.setIcon(carClickedIcon);
-			} else if (pLot2.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot2.setIcon(motorcycleClickedIcon);
-			} else if (pLot2.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot2.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot3) {
-
-			deselectItems();
-			if (pLot3.getIcon().equals(carMouseOverIcon)) {
-				pLot3.setIcon(carClickedIcon);
-			} else if (pLot3.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot3.setIcon(motorcycleClickedIcon);
-			} else if (pLot3.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot3.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot4) {
-
-			deselectItems();
-			if (pLot4.getIcon().equals(carMouseOverIcon)) {
-				pLot4.setIcon(carClickedIcon);
-			} else if (pLot4.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot4.setIcon(motorcycleClickedIcon);
-			} else if (pLot4.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot4.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot5) {
-
-			deselectItems();
-			if (pLot5.getIcon().equals(carMouseOverIcon)) {
-				pLot5.setIcon(carClickedIcon);
-			} else if (pLot5.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot5.setIcon(motorcycleClickedIcon);
-			} else if (pLot5.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot5.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot6) {
-
-			deselectItems();
-			if (pLot6.getIcon().equals(carMouseOverIcon)) {
-				pLot6.setIcon(carClickedIcon);
-			} else if (pLot6.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot6.setIcon(motorcycleClickedIcon);
-			} else if (pLot6.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot6.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot7) {
-
-			deselectItems();
-			if (pLot7.getIcon().equals(carMouseOverIcon)) {
-				pLot7.setIcon(carClickedIcon);
-			} else if (pLot7.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot7.setIcon(motorcycleClickedIcon);
-			} else if (pLot7.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot7.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot8) {
-
-			deselectItems();
-			if (pLot8.getIcon().equals(carMouseOverIcon)) {
-				pLot8.setIcon(carClickedIcon);
-			} else if (pLot8.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot8.setIcon(motorcycleClickedIcon);
-			} else if (pLot8.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot8.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot9) {
-
-			deselectItems();
-			if (pLot9.getIcon().equals(carMouseOverIcon)) {
-				pLot9.setIcon(carClickedIcon);
-			} else if (pLot9.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot9.setIcon(motorcycleClickedIcon);
-			} else if (pLot9.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot9.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot10) {
-
-			deselectItems();
-			if (pLot10.getIcon().equals(carMouseOverIcon)) {
-				pLot10.setIcon(carClickedIcon);
-			} else if (pLot10.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot10.setIcon(motorcycleClickedIcon);
-			} else if (pLot10.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot10.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot11) {
-
-			deselectItems();
-			if (pLot11.getIcon().equals(carMouseOverIcon)) {
-				pLot11.setIcon(carClickedIcon);
-			} else if (pLot11.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot11.setIcon(motorcycleClickedIcon);
-			} else if (pLot11.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot11.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot12) {
-
-			deselectItems();
-			if (pLot12.getIcon().equals(carMouseOverIcon)) {
-				pLot12.setIcon(carClickedIcon);
-			} else if (pLot12.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot1.setIcon(motorcycleClickedIcon);
-			} else if (pLot12.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot12.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot13) {
-
-			deselectItems();
-			if (pLot13.getIcon().equals(carMouseOverIcon)) {
-				pLot13.setIcon(carClickedIcon);
-			} else if (pLot13.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot13.setIcon(motorcycleClickedIcon);
-			} else if (pLot13.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot13.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot14) {
-
-			deselectItems();
-			if (pLot14.getIcon().equals(carMouseOverIcon)) {
-				pLot14.setIcon(carClickedIcon);
-			} else if (pLot14.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot14.setIcon(motorcycleClickedIcon);
-			} else if (pLot14.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot14.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot15) {
-
-			deselectItems();
-			if (pLot15.getIcon().equals(carMouseOverIcon)) {
-				pLot15.setIcon(carClickedIcon);
-			} else if (pLot15.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot15.setIcon(motorcycleClickedIcon);
-			} else if (pLot15.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot15.setIcon(parkingLotClickedIcon);
-			}
-
-		} else if (evt.getSource() == pLot16) {
-
-			deselectItems();
-			if (pLot16.getIcon().equals(carMouseOverIcon)) {
-				pLot16.setIcon(carClickedIcon);
-			} else if (pLot16.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot16.setIcon(motorcycleClickedIcon);
-			} else if (pLot16.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot16.setIcon(parkingLotClickedIcon);
-			}
-
+	public void deselectAllParkingLotLabels() {
+		for (ParkingLotLabel label : arrayParkingLotLabels) {
+			label.deselectIcon();
 		}
 
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
+	public void priceValueChange(String priceValueChange) {
+		priceInfoLbl.setText("Tarifa por hora:        $ " + priceValueChange);
 
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent evt) {
-
-		if (evt.getSource() == pLot1) {
-
-			if (pLot1.getIcon().equals(carIcon)) {
-				pLot1.setIcon(carMouseOverIcon);
-			} else if (pLot1.getIcon().equals(motorcycleIcon)) {
-				pLot1.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot1.getIcon().equals(emptySpotIcon)) {
-				pLot1.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot2) {
-
-			if (pLot2.getIcon().equals(carIcon)) {
-				pLot2.setIcon(carMouseOverIcon);
-			} else if (pLot2.getIcon().equals(motorcycleIcon)) {
-				pLot2.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot2.getIcon().equals(emptySpotIcon)) {
-				pLot2.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot3) {
-
-			if (pLot3.getIcon().equals(carIcon)) {
-				pLot3.setIcon(carMouseOverIcon);
-			} else if (pLot3.getIcon().equals(motorcycleIcon)) {
-				pLot3.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot3.getIcon().equals(emptySpotIcon)) {
-				pLot3.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot4) {
-
-			if (pLot4.getIcon().equals(carIcon)) {
-				pLot4.setIcon(carMouseOverIcon);
-			} else if (pLot4.getIcon().equals(motorcycleIcon)) {
-				pLot4.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot4.getIcon().equals(emptySpotIcon)) {
-				pLot4.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot5) {
-
-			if (pLot5.getIcon().equals(carIcon)) {
-				pLot5.setIcon(carMouseOverIcon);
-			} else if (pLot5.getIcon().equals(motorcycleIcon)) {
-				pLot5.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot5.getIcon().equals(emptySpotIcon)) {
-				pLot5.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot6) {
-
-			if (pLot6.getIcon().equals(carIcon)) {
-				pLot6.setIcon(carMouseOverIcon);
-			} else if (pLot6.getIcon().equals(motorcycleIcon)) {
-				pLot6.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot6.getIcon().equals(emptySpotIcon)) {
-				pLot6.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot7) {
-
-			if (pLot7.getIcon().equals(carIcon)) {
-				pLot7.setIcon(carMouseOverIcon);
-			} else if (pLot7.getIcon().equals(motorcycleIcon)) {
-				pLot7.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot7.getIcon().equals(emptySpotIcon)) {
-				pLot7.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot8) {
-
-			if (pLot8.getIcon().equals(carIcon)) {
-				pLot8.setIcon(carMouseOverIcon);
-			} else if (pLot8.getIcon().equals(motorcycleIcon)) {
-				pLot8.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot8.getIcon().equals(emptySpotIcon)) {
-				pLot8.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot9) {
-
-			if (pLot9.getIcon().equals(carIcon)) {
-				pLot9.setIcon(carMouseOverIcon);
-			} else if (pLot9.getIcon().equals(motorcycleIcon)) {
-				pLot9.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot9.getIcon().equals(emptySpotIcon)) {
-				pLot9.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot10) {
-
-			if (pLot10.getIcon().equals(carIcon)) {
-				pLot10.setIcon(carMouseOverIcon);
-			} else if (pLot10.getIcon().equals(motorcycleIcon)) {
-				pLot10.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot10.getIcon().equals(emptySpotIcon)) {
-				pLot10.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot11) {
-
-			if (pLot11.getIcon().equals(carIcon)) {
-				pLot11.setIcon(carMouseOverIcon);
-			} else if (pLot11.getIcon().equals(motorcycleIcon)) {
-				pLot11.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot11.getIcon().equals(emptySpotIcon)) {
-				pLot11.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot12) {
-
-			if (pLot12.getIcon().equals(carIcon)) {
-				pLot12.setIcon(carMouseOverIcon);
-			} else if (pLot12.getIcon().equals(motorcycleIcon)) {
-				pLot12.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot12.getIcon().equals(emptySpotIcon)) {
-				pLot12.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot13) {
-
-			if (pLot13.getIcon().equals(carIcon)) {
-				pLot13.setIcon(carMouseOverIcon);
-			} else if (pLot13.getIcon().equals(motorcycleIcon)) {
-				pLot13.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot13.getIcon().equals(emptySpotIcon)) {
-				pLot13.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot14) {
-
-			if (pLot14.getIcon().equals(carIcon)) {
-				pLot14.setIcon(carMouseOverIcon);
-			} else if (pLot14.getIcon().equals(motorcycleIcon)) {
-				pLot14.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot14.getIcon().equals(emptySpotIcon)) {
-				pLot14.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot15) {
-
-			if (pLot15.getIcon().equals(carIcon)) {
-				pLot15.setIcon(carMouseOverIcon);
-			} else if (pLot15.getIcon().equals(motorcycleIcon)) {
-				pLot15.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot15.getIcon().equals(emptySpotIcon)) {
-				pLot15.setIcon(parkingLotMouseOverIcon);
-			}
-
-		} else if (evt.getSource() == pLot16) {
-
-			if (pLot16.getIcon().equals(carIcon)) {
-				pLot16.setIcon(carMouseOverIcon);
-			} else if (pLot16.getIcon().equals(motorcycleIcon)) {
-				pLot16.setIcon(motorcycleMouseOverIcon);
-			} else if (pLot16.getIcon().equals(emptySpotIcon)) {
-				pLot16.setIcon(parkingLotMouseOverIcon);
-			}
-
-		}
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent evt) {
-
-		if (evt.getSource() == pLot1) {
-
-			if (pLot1.getIcon().equals(carMouseOverIcon)) {
-				pLot1.setIcon(carIcon);
-			} else if(pLot1.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot1.setIcon(motorcycleIcon);
-			} else if(pLot1.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot1.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot2) {
-
-			if (pLot2.getIcon().equals(carMouseOverIcon)) {
-				pLot2.setIcon(carIcon);
-			} else if(pLot2.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot2.setIcon(motorcycleIcon);
-			} else if(pLot2.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot2.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot3) {
-
-			if (pLot3.getIcon().equals(carMouseOverIcon)) {
-				pLot3.setIcon(carIcon);
-			} else if(pLot3.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot3.setIcon(motorcycleIcon);
-			} else if(pLot3.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot3.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot4) {
-
-			if (pLot4.getIcon().equals(carMouseOverIcon)) {
-				pLot4.setIcon(carIcon);
-			} else if(pLot4.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot4.setIcon(motorcycleIcon);
-			} else if(pLot4.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot4.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot5) {
-
-			if (pLot5.getIcon().equals(carMouseOverIcon)) {
-				pLot5.setIcon(carIcon);
-			} else if(pLot5.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot5.setIcon(motorcycleIcon);
-			} else if(pLot5.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot5.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot6) {
-
-			if (pLot6.getIcon().equals(carMouseOverIcon)) {
-				pLot6.setIcon(carIcon);
-			} else if(pLot6.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot6.setIcon(motorcycleIcon);
-			} else if(pLot6.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot6.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot7) {
-
-			if (pLot7.getIcon().equals(carMouseOverIcon)) {
-				pLot7.setIcon(carIcon);
-			} else if(pLot7.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot7.setIcon(motorcycleIcon);
-			} else if(pLot7.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot7.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot8) {
-
-			if (pLot8.getIcon().equals(carMouseOverIcon)) {
-				pLot8.setIcon(carIcon);
-			} else if(pLot8.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot8.setIcon(motorcycleIcon);
-			} else if(pLot8.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot8.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot9) {
-
-			if (pLot9.getIcon().equals(carMouseOverIcon)) {
-				pLot9.setIcon(carIcon);
-			} else if(pLot9.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot9.setIcon(motorcycleIcon);
-			} else if(pLot9.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot9.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot10) {
-
-			if (pLot10.getIcon().equals(carMouseOverIcon)) {
-				pLot10.setIcon(carIcon);
-			} else if(pLot10.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot10.setIcon(motorcycleIcon);
-			} else if(pLot10.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot10.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot11) {
-
-			if (pLot11.getIcon().equals(carMouseOverIcon)) {
-				pLot11.setIcon(carIcon);
-			} else if(pLot11.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot11.setIcon(motorcycleIcon);
-			} else if(pLot11.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot11.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot12) {
-
-			if (pLot12.getIcon().equals(carMouseOverIcon)) {
-				pLot12.setIcon(carIcon);
-			} else if(pLot12.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot12.setIcon(motorcycleIcon);
-			} else if(pLot12.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot12.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot13) {
-
-			if (pLot13.getIcon().equals(carMouseOverIcon)) {
-				pLot13.setIcon(carIcon);
-			} else if(pLot13.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot13.setIcon(motorcycleIcon);
-			} else if(pLot13.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot13.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot14) {
-
-			if (pLot14.getIcon().equals(carMouseOverIcon)) {
-				pLot14.setIcon(carIcon);
-			} else if(pLot14.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot14.setIcon(motorcycleIcon);
-			} else if(pLot14.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot14.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot15) {
-
-			if (pLot15.getIcon().equals(carMouseOverIcon)) {
-				pLot15.setIcon(carIcon);
-			} else if(pLot15.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot15.setIcon(motorcycleIcon);
-			} else if(pLot15.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot15.setIcon(emptySpotIcon);}
-
-		} else if (evt.getSource() == pLot16) {
-
-			if (pLot16.getIcon().equals(carMouseOverIcon)) {
-				pLot16.setIcon(carIcon);
-			} else if(pLot16.getIcon().equals(motorcycleMouseOverIcon)) {
-				pLot16.setIcon(motorcycleIcon);
-			} else if(pLot16.getIcon().equals(parkingLotMouseOverIcon)) {
-				pLot16.setIcon(emptySpotIcon);}
-
-		}
-
-	}
-
-	public void deselectItems() {
-		ArrayList<JLabel> parkingLots = new ArrayList<>();
-		parkingLots.add(pLot1);
-		parkingLots.add(pLot2);
-		parkingLots.add(pLot3);
-		parkingLots.add(pLot4);
-		parkingLots.add(pLot5);
-		parkingLots.add(pLot6);
-		parkingLots.add(pLot7);
-		parkingLots.add(pLot8);
-		parkingLots.add(pLot9);
-		parkingLots.add(pLot10);
-		parkingLots.add(pLot11);
-		parkingLots.add(pLot12);
-		parkingLots.add(pLot13);
-		parkingLots.add(pLot14);
-		parkingLots.add(pLot15);
-		parkingLots.add(pLot16);
-		
-		for(JLabel parkingLot : parkingLots) {
-			
-			if(parkingLot.getIcon() == carClickedIcon) {
-				parkingLot.setIcon(carIcon);
-			} else if(parkingLot.getIcon() == motorcycleClickedIcon) {
-				parkingLot.setIcon(motorcycleIcon);
-			} else if(parkingLot.getIcon() == parkingLotClickedIcon) {
-				parkingLot.setIcon(emptySpotIcon);
-			}
-			
-		}
 	}
 
 }

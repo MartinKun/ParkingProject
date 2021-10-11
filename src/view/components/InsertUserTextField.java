@@ -12,13 +12,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JTextField;
 
-/**
- *
- * @author conde
- */
 public class InsertUserTextField extends JTextField implements IConfigureTextField, KeyListener, FocusListener{
 
-    private final int CHAR_LIMIT = 10;
+	private static final long serialVersionUID = 1L;
+	private final int CHAR_LIMIT = 10;
     
     public InsertUserTextField(){
         addKeyListener(this);

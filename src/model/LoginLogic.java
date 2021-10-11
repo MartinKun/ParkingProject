@@ -3,10 +3,9 @@ package model;
 
 import java.util.ArrayList;
 
-import controller.Controller;
 import helpers.Encoder;
 import model.dao.UserDao;
-import model.entity.User;
+import model.domain.User;
 
 public class LoginLogic {
 

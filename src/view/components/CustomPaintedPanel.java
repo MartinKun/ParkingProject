@@ -10,20 +10,20 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-/**
- *
- * @author conde
- */
+
 public class CustomPaintedPanel extends JPanel{
     
-    private String fileName;
+	private static final long serialVersionUID = 1L;
+	
+	private String fileName;
     private Image image;
 
     public CustomPaintedPanel(String fileName) {
         this.fileName = fileName;
     }
     
-    public void paint (Graphics g){
+    @Override
+	public void paint (Graphics g){
         image = new ImageIcon(getClass().getResource(fileName)).getImage();
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
         setOpaque(false);

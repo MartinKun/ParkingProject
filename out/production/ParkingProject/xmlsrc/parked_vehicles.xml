@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<parking_lots>
+    <parking_lot spot="1">
+        <admission_date>11/10/2021</admission_date>
+        <admission_hour>21:08:28</admission_hour>
+        <plate>FG 567 UY</plate>
+        <vehicle>Automovil</vehicle>
+    </parking_lot>
+    <parking_lot spot="2">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="3">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="4">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="5">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="6">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="7">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="8">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="9">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="10">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="11">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="12">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="13">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="14">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="15">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+    <parking_lot spot="16">
+        <admission_date>-</admission_date>
+        <admission_hour>-</admission_hour>
+        <plate>-</plate>
+        <vehicle>-</vehicle>
+    </parking_lot>
+</parking_lots>

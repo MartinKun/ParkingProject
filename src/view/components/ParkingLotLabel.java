@@ -21,7 +21,7 @@ public class ParkingLotLabel extends JLabel implements MouseListener, Observable
 	private static final long serialVersionUID = 1L;
 	
 	private int parkingLotNumber;
-	private ArrayList<SelectParkingLotObserver> selectParkingLotsObservers = new ArrayList<>();
+	private ArrayList<SelectParkingLotObserver> selectParkingLotsObservers = new ArrayList();
 	ImageIcons imageIcons = new ImageIcons();
 
 	public ParkingLotLabel() {

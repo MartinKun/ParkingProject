@@ -21,8 +21,8 @@ public class ParkingLogic implements Observable<ParkingLotsObserver>, PriceObser
 	private PriceByHourDao priceByHourDao;
 	private VehicleMovementsDao vehicleMovementsDao;
 	private ArrayList<ParkingLot> parkingLots;
-	private ArrayList<ParkingLotsObserver> parkingLotsObservers = new ArrayList<>();
-	private ArrayList<PriceObserver> priceObservers = new ArrayList<>();
+	private ArrayList<ParkingLotsObserver> parkingLotsObservers = new ArrayList();
+	private ArrayList<PriceObserver> priceObservers = new ArrayList();
 	private String priceValueChange;
 	private ParkedVehicleData parkedVehicleData;
 
@@ -67,7 +67,7 @@ public class ParkingLogic implements Observable<ParkingLotsObserver>, PriceObser
 	}
 
 	public String[] getAvailableSpots() {
-		ArrayList<String> availableSpotsArrayList = new ArrayList<>();
+		ArrayList<String> availableSpotsArrayList = new ArrayList();
 
 		for (ParkingLot parkingLot : parkingLots) {
 

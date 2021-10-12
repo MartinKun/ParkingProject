@@ -129,8 +129,8 @@ public class MainFrame extends javax.swing.JFrame
 		jPanel1 = new javax.swing.JPanel();
 		enterVPlatePanel = new CustomPaintedPanel("../../resources/images/plate.png");
 		vPlateNumberTextField = new EnterVehiclePlateTextField();
-		choiceVehicleComboBox = new javax.swing.JComboBox<>();
-		choiceParkingLotComboBox = new javax.swing.JComboBox<>();
+		choiceVehicleComboBox = new javax.swing.JComboBox();
+		choiceParkingLotComboBox = new javax.swing.JComboBox();
 		parkingLotLbl = new javax.swing.JLabel();
 		btnEnterVehicle = new javax.swing.JButton();
 		middlePanel = new javax.swing.JPanel();
@@ -187,7 +187,7 @@ public class MainFrame extends javax.swing.JFrame
 		pLot15.setParkingLotNumber(15);
 		pLot16.setParkingLotNumber(16);
 
-		arrayParkingLotLabels = new ArrayList<>();
+		arrayParkingLotLabels = new ArrayList();
 		arrayParkingLotLabels.add(pLot1);
 		arrayParkingLotLabels.add(pLot2);
 		arrayParkingLotLabels.add(pLot3);
@@ -299,7 +299,7 @@ public class MainFrame extends javax.swing.JFrame
 								.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
 		choiceVehicleComboBox.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-		choiceVehicleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(
+		choiceVehicleComboBox.setModel(new javax.swing.DefaultComboBoxModel(
 				new String[] { "Tipo de Vehiculo", "Automovil", "Motocicleta" }));
 
 		choiceParkingLotComboBox.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -670,7 +670,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	public void buildParkingLotComboBox(String[] availableSpots) {
 
-		choiceParkingLotComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(availableSpots));
+		choiceParkingLotComboBox.setModel(new javax.swing.DefaultComboBoxModel(availableSpots));
 
 	}
 

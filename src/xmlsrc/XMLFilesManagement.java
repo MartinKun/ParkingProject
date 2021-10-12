@@ -2,6 +2,8 @@ package xmlsrc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -38,9 +40,13 @@ public class XMLFilesManagement {
 			xmlDataCashBalancing.generateDocument();
 			xmlDataCashBalancing.generateXML(cashBalancingFile);
 
-		} catch (ParserConfigurationException | IOException | TransformerException ex) {
+		} catch (ParserConfigurationException ex) {
 			System.out.println(ex.getMessage());
-		}
+		} catch (IOException ex) {
+                Logger.getLogger(XMLFilesManagement.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransformerException ex) {
+                Logger.getLogger(XMLFilesManagement.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
 	}
 

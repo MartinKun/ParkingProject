@@ -177,6 +177,7 @@ public class DetailPanel extends JPanel implements ActionListener {
 				if(controller.confirmRemoveVehicle()) {
 					boolean response = controller.removeParkingLot(parkingLotSelected);
 					if(response) {
+						controller.restartDetailPanelValues();
 						controller.successVehicleRemovedMessage();
 					}
 				}

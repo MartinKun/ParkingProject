@@ -4,46 +4,35 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import model.domain.TimeParked;
+import model.dto.TimeParked;
 
 public class DateHelper {
 
-	public static String getActualDay(Date date) {
+	public static String formatDateToDay(Date date) {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
 
 		return dateFormat.format(date);
 	}
 
-	public static String getActualHour(Date date) {
+	public static String formatDateToHour(Date date) {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
 		return dateFormat.format(date);
 	}
-
-	public static TimeParked getTimeParked(String admissionDate, String admissionTime) {
-
-		// 5/02/2021
-		String[] admissionDateArray = admissionDate.split("/");
-		int admissionDay = Integer.valueOf(admissionDateArray[0]);
-		int admissionMonth = Integer.valueOf(admissionDateArray[1]);
-		int admissionYear = Integer.valueOf(admissionDateArray[2]);
-
-		String[] admissionTimeArray = admissionTime.split(":");
-		int admissionHour = Integer.valueOf(admissionTimeArray[0]);
-		int admissionMinutes = Integer.valueOf(admissionTimeArray[1]);
-		int admissionSeconds = Integer.valueOf(admissionTimeArray[2]);
-
-		Calendar admissionCalendar = Calendar.getInstance();
-		admissionCalendar.set(admissionYear, admissionMonth - 1, admissionDay, admissionHour, admissionMinutes,
-				admissionSeconds);
-
-		Calendar actualCalendar = Calendar.getInstance();
-		Date actualDate = actualCalendar.getTime();
-
-		double result = Math.abs(actualDate.getTime() - admissionCalendar.getTimeInMillis()) / 1000;
-
+	
+	public static TimeParked getTimeParked(Date entryDate, Date departureDate) {
+		
+		Calendar entryDateCalendar = Calendar.getInstance();
+		entryDateCalendar.setTime(entryDate);
+		
+		Calendar departureDateCalendar = Calendar.getInstance();
+		//Date actualDate = actualCalendar.getTime();
+		departureDateCalendar.setTime(departureDate);
+		
+		double result = Math.abs(departureDateCalendar.getTimeInMillis() - entryDateCalendar.getTimeInMillis()) / 1000;
+		
 		int secondsResult = 0;
 		int minutesResult = 0;
 		int hoursResult = 0;
@@ -111,7 +100,6 @@ public class DateHelper {
 		}
 
 		return new TimeParked(daysResult, hoursResult, minutesResult, secondsResult);
-
 	}
 
 }

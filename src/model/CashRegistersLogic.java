@@ -1,103 +1,96 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 import helpers.DateHelper;
-import model.dao.CashBalancingDao;
-import model.domain.CashRegister;
-import model.domain.ParkedVehicleData;
+import helpers.LanguageManager;
+import model.dao.CashRegisterDao;
+import model.dao.PaymentInformationDao;
+import model.dto.CashRegister;
+import model.dto.TimeParked;
+import model.dto.PaymentInformation;
 
 public class CashRegistersLogic {
-	private CashBalancingDao cashBalancingDao;
+	private PaymentInformationDao paymentInformationDao;
+	private CashRegisterDao cashRegisterDao;
 
-	public void setCashBalancingDao(CashBalancingDao cashBalancingDao) {
-		this.cashBalancingDao = cashBalancingDao;
-	}
-	
-	
-	public boolean addRegister(CashRegister register) {
-		return cashBalancingDao.insertCashRegister(register);
+	public void setCashRegisterDao(CashRegisterDao cashRegisterDao) {
+		this.cashRegisterDao = cashRegisterDao;
 	}
 
-
-	public CashRegister createRegister(ParkedVehicleData parkedVehicleData) {
-		CashRegister cashRegister = new CashRegister();
-		Date date = new Date();
-		cashRegister.setDateOfIssue(DateHelper.getActualDay(date) + "   "
-				+ DateHelper.getActualHour(date));
-		String vehicle = "(" + parkedVehicleData.getParkingLot().getVehicle() + ")   " 
-				+ parkedVehicleData.getParkingLot().getPlate();
-		cashRegister.setVehicle(vehicle);
-		String admission = parkedVehicleData.getParkingLot().getAdmissionDate() + "   "
-				+ parkedVehicleData.getParkingLot().getAdmissionHour();
-		cashRegister.setAdmission(admission);
-		String parkedTime = parkedVehicleData.getTimeParked();
-		cashRegister.setParkedTime(parkedTime);
-		cashRegister.setPartial(parkedVehicleData.getPartialAmountPayable() + "");
-		cashRegister.setDiscount(parkedVehicleData.getDiscount() + "");
-		cashRegister.setTotal(parkedVehicleData.getTotalAmountPayable() + "");
-		return cashRegister;
+	public void setPaymentInformationDao(PaymentInformationDao paymentInformationDao) {
+		this.paymentInformationDao = paymentInformationDao;
 	}
 
-
-	public String getCashBalancingData() {
-		String response = "";
-		ArrayList<CashRegister> registers = listCashRegisters();
-		
-		if(registers == null) {
-			response = "No hay registros.";
-		} else {
-			response = generateCashBalancingMessage(registers);
-		}
-		
-		return response;
+	public PaymentInformation insertPayInformation(PaymentInformation paymentInformation) {
+		return paymentInformationDao.insertPaymentInformation(paymentInformation);
 	}
-	
-	private String generateCashBalancingMessage(ArrayList<CashRegister> registers) {
+
+	public List<CashRegister> listCashRegisters() {
+
+		return cashRegisterDao.listCashRegisters();
+	}
+
+	public CashRegister insertCashRegister(CashRegister register) {
+		return cashRegisterDao.insertCashRegister(register);
+	}
+
+	public String getCashBalancingData(List<CashRegister> registers) {
+		LanguageManager languageManager = LanguageManager.getInstance();
 		StringBuilder stringBuilder = new StringBuilder();
 		double total = 0;
-		
-		for(CashRegister register : registers) {
+
+		for (CashRegister register : registers) {
+			StringBuilder timeParkedStringBuilder = new StringBuilder();
+
+			TimeParked timeParked = DateHelper.getTimeParked(register.getVehicle().getDetail().getEntryDate(),
+					register.getVehicle().getDetail().getDepartureDate());
+
+			if (timeParked.getDay() != 0) {
+				timeParkedStringBuilder.append(timeParked.getDay()).append(languageManager.getProperty("days"))
+						.append(",");
+			}
+			timeParkedStringBuilder.append(timeParked.getHour()).append("Hrs");
+			timeParkedStringBuilder.append(timeParked.getMinutes()).append("min");
+			timeParkedStringBuilder.append(timeParked.getSeconds()).append(languageManager.getProperty("sec"));
+
 			stringBuilder.append("\n");
 			stringBuilder.append("\n");
-			stringBuilder.append(register.getDateOfIssue());
+			stringBuilder.append(DateHelper.formatDateToDay(register.getCreateDate())).append("   ")
+					.append(DateHelper.formatDateToHour(register.getCreateDate()));
 			stringBuilder.append("\n");
-			stringBuilder.append("VEHICULO:   ");
-			stringBuilder.append(register.getVehicle());
+			stringBuilder.append(languageManager.getProperty("vehicle").toUpperCase()).append(":   ");
+			stringBuilder.append(register.getVehicle().getType());
 			stringBuilder.append("\n");
-			stringBuilder.append("INGRESO:   ");
-			stringBuilder.append(register.getAdmission());
+			stringBuilder.append(languageManager.getProperty("entry").toUpperCase()).append(":   ");
+			stringBuilder.append(DateHelper.formatDateToHour(register.getVehicle().getDetail().getEntryDate()))
+					.append("   ")
+					.append(DateHelper.formatDateToDay(register.getVehicle().getDetail().getDepartureDate()));
 			stringBuilder.append("\n");
-			stringBuilder.append("TIEMPO APARCADO:   ");
-			stringBuilder.append(register.getParkedTime());
+			stringBuilder.append(languageManager.getProperty("time_parked").toUpperCase()).append(":   ");
+			stringBuilder.append(timeParkedStringBuilder.toString());
 			stringBuilder.append("\n");
-			stringBuilder.append("PARCIAL:   $ ");
-			stringBuilder.append(register.getPartial());
+			stringBuilder.append(languageManager.getProperty("partial").toUpperCase()).append(":   $ ");
+			stringBuilder.append(register.getPaymentInformation().getPartial());
 			stringBuilder.append("\n");
-			stringBuilder.append("DESCUENTO:   % ");
-			stringBuilder.append(register.getDiscount());
+			stringBuilder.append(languageManager.getProperty("discount").toUpperCase()).append(":   % ");
+			stringBuilder.append(register.getPaymentInformation().getDiscount());
 			stringBuilder.append("\n");
-			stringBuilder.append("FINAL:   $ ");
-			stringBuilder.append(register.getTotal());
+			stringBuilder.append(languageManager.getProperty("final").toUpperCase()).append(":   $ ");
+			stringBuilder.append(register.getPaymentInformation().getTotal());
 			stringBuilder.append("\n");
 			stringBuilder.append("\n");
 			stringBuilder.append("- - - - - - - - - - - - - - - - - - - - - - - - ");
-			
-			total += Double.parseDouble(register.getTotal());
-			
+
+			total += register.getPaymentInformation().getTotal();
+
 		}
 		stringBuilder.append("\n");
 		stringBuilder.append("\n");
-		stringBuilder.append("RECAUDACION TOTAL:       $ ");
+		stringBuilder.append(languageManager.getProperty("total_recaudation").toUpperCase()).append(":       $ ");
 		stringBuilder.append(total + "");
-		
+
 		return stringBuilder.toString();
-	}
-
-
-	public ArrayList<CashRegister> listCashRegisters() {
-		return cashBalancingDao.listCashRegisters();
 	}
 
 }

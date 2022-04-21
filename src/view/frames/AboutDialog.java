@@ -2,25 +2,20 @@ package view.frames;
 
 import java.awt.Font;
 
+import helpers.LanguageManager;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-/**
- *
- * @author conde
- */
 public class AboutDialog extends javax.swing.JDialog {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	/**
-     * Creates new form AboutDialog
-     */
+
+	private LanguageManager languageManager = LanguageManager.getInstance();
+	
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -38,11 +33,11 @@ public class AboutDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         aboutLbl.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        aboutLbl.setText("Acerca de esta aplicacion:");
+        aboutLbl.setText(languageManager.getProperty("about_this_app") + ":");
 
         appInfoTxtArea.setColumns(20);
         appInfoTxtArea.setRows(5);
-        appInfoTxtArea.setText("Parking App es una aplicación de escritorio diseñada para\nllevar a cabo la administración de un sistema de aparcamien-\nto de vehículos. \n\nAlgunas de las operaciones basicas que cubre son:\n\n- Ingresar los datos de los vehículos a una base de datos\nlocal.\n- Cronometrar el tiempo en el que el vehículo permanece\naparcado.\n- Mostrar el monto que debe adeudar cada cliente de acuerdo\nal tiempo que lleva aparcado su vehiculo.\n- Actualizar la tarifa por hora.\n- Consultar los registros de la recaudacion de la caja y\nguardarla en un archivo de texto.\n- Consultar la información del ingreso y salida de los \nvehículos y guardarla en un archivo de texto.\n\nLo que este sistema no es:\n-No es un sistema contable. Sólo guarda y muestra la \ninformación básica del monto ingresado + el descuento.\n-No es un sistema de impresion de tickets. Ni tiene salida\na otros dispositivos de impresión.\n-No es un sistema de parking profesional. Sólo realiza las\noperaciones básicas antes mencionadas.\n\ndesarrollada por Martín Kun - Java Developer.\ncontacto: martinkunbrc@hotmail.com");
+        appInfoTxtArea.setText(languageManager.getProperty("app_description"));
         appInfoTxtArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
         jScrollPane1.setViewportView(appInfoTxtArea);
 

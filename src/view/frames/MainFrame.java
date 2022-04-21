@@ -16,17 +16,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import controller.Controller;
-import model.ParkingLotsObserver;
-import model.PriceObserver;
-import model.SelectParkingLotObserver;
-import model.domain.ImageIcons;
-import model.domain.ParkingLot;
-import model.privileges.Privileges;
+import helpers.LanguageManager;
+import helpers.ParkingLotsObserver;
+import helpers.PriceObserver;
+import helpers.SelectParkingLotObserver;
+import model.dto.ImageIcons;
+import model.dto.ParkingLot;
+import model.dto.Vehicle;
+import model.enums.Privileges;
 import view.components.CustomPaintedPanel;
 import view.components.DetailPanel;
 import view.components.EnterVehiclePlateTextField;
@@ -42,6 +46,8 @@ public class MainFrame extends javax.swing.JFrame
 	private Dimension sizeWindow;
 	private Rectangle window;
 	private Controller controller;
+	
+	private LanguageManager languageManager = LanguageManager.getInstance();
 
 	private javax.swing.JMenuItem aboutMenuItem;
 	private javax.swing.JPanel borderTopRightPanel;
@@ -86,7 +92,7 @@ public class MainFrame extends javax.swing.JFrame
 	private javax.swing.JPanel sketchPanel;
 	private javax.swing.JTabbedPane tabbedPaneContainer;
 	private javax.swing.JPanel tablePanelContainer;
-	private javax.swing.JTextField vPlateNumberTextField;
+	private javax.swing.JTextField vPlateTextField;
 
 	ImageIcons imageIcons = new ImageIcons();
 
@@ -94,7 +100,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	public MainFrame() {
 
-		setTitle("Principal");
+		setTitle(languageManager.getProperty("main.title"));
 		sizeWindow = Toolkit.getDefaultToolkit().getScreenSize();
 		window = new Rectangle(sizeWindow);
 		setBounds(window);
@@ -110,7 +116,7 @@ public class MainFrame extends javax.swing.JFrame
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				int resp = JOptionPane.showConfirmDialog(null, "Estas seguro que deseas salir del programa?");
+				int resp = JOptionPane.showConfirmDialog(null, languageManager.getProperty("main.close_program_confirmation"));
 				if (JOptionPane.OK_OPTION == resp) {
 					System.exit(0);
 				}
@@ -128,7 +134,14 @@ public class MainFrame extends javax.swing.JFrame
 		mainPanel = new javax.swing.JPanel();
 		jPanel1 = new javax.swing.JPanel();
 		enterVPlatePanel = new CustomPaintedPanel("../../resources/images/plate.png");
-		vPlateNumberTextField = new EnterVehiclePlateTextField();
+		
+		if(languageManager.getActualLanguage().equals("ES")) {
+			enterVPlatePanel = new CustomPaintedPanel("../../resources/images/plate_es.png");
+		} else if(languageManager.getActualLanguage().equals("EN")) {
+			enterVPlatePanel = new CustomPaintedPanel("../../resources/images/plate_en.png");
+		}
+		
+		vPlateTextField = new EnterVehiclePlateTextField();
 		choiceVehicleComboBox = new javax.swing.JComboBox();
 		choiceParkingLotComboBox = new javax.swing.JComboBox();
 		parkingLotLbl = new javax.swing.JLabel();
@@ -230,13 +243,13 @@ public class MainFrame extends javax.swing.JFrame
 		btnChangePrice.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 		btnChangePrice
 				.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/change_price_icon.png"))); // NOI18N
-		btnChangePrice.setText("Cambiar Tarifa");
+		btnChangePrice.setText(languageManager.getProperty("main.change_price"));
 		btnChangePrice.setEnabled(false);
 		btnChangePrice.addActionListener(this);
 
 		btnSeeReports.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 		btnSeeReports.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/reports_icon.png"))); // NOI18N
-		btnSeeReports.setText(" Ver Reportes   ");
+		btnSeeReports.setText(languageManager.getProperty("main.see_reports"));
 		btnSeeReports.addActionListener(this);
 		btnSeeReports.setEnabled(false);
 
@@ -279,8 +292,8 @@ public class MainFrame extends javax.swing.JFrame
 		jPanel1.setMinimumSize(new java.awt.Dimension(1551, 100));
 		jPanel1.setPreferredSize(new java.awt.Dimension(1551, 250));
 
-		vPlateNumberTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		vPlateNumberTextField.setBorder(null);
+		vPlateTextField.setHorizontalAlignment(SwingConstants.CENTER);
+		vPlateTextField.setBorder(null);
 
 		javax.swing.GroupLayout enterVPlatePanelLayout = new javax.swing.GroupLayout(enterVPlatePanel);
 		enterVPlatePanel.setLayout(enterVPlatePanelLayout);
@@ -288,29 +301,30 @@ public class MainFrame extends javax.swing.JFrame
 				.setHorizontalGroup(
 						enterVPlatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addGroup(enterVPlatePanelLayout.createSequentialGroup().addGap(51, 51, 51)
-										.addComponent(vPlateNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE,
+										.addComponent(vPlateTextField, javax.swing.GroupLayout.PREFERRED_SIZE,
 												323, javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addContainerGap(42, Short.MAX_VALUE)));
 		enterVPlatePanelLayout
 				.setVerticalGroup(enterVPlatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 						.addGroup(enterVPlatePanelLayout.createSequentialGroup().addGap(41, 41, 41)
-								.addComponent(vPlateNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 51,
+								.addComponent(vPlateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 51,
 										javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
 		choiceVehicleComboBox.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
 		choiceVehicleComboBox.setModel(new javax.swing.DefaultComboBoxModel(
-				new String[] { "Tipo de Vehiculo", "Automovil", "Motocicleta" }));
+				new String[] { languageManager.getProperty("main.vehicle_type"), languageManager.getProperty("main.car"), 
+						languageManager.getProperty("main.motorcycle") }));
 
 		choiceParkingLotComboBox.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
 		parkingLotLbl.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
 		parkingLotLbl.setForeground(new java.awt.Color(255, 255, 255));
-		parkingLotLbl.setText("Lugar:");
+		parkingLotLbl.setText(languageManager.getProperty("main.spot"));
 
 		btnEnterVehicle.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
 		btnEnterVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/car_in_icon.png"))); // NOI18N
-		btnEnterVehicle.setText("INGRESAR VEHICULO");
+		btnEnterVehicle.setText(languageManager.getProperty("main.enter_vehicle"));
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
@@ -477,7 +491,7 @@ public class MainFrame extends javax.swing.JFrame
 														javax.swing.GroupLayout.PREFERRED_SIZE))))
 						.addGap(38, 38, 38)));
 
-		tabbedPaneContainer.addTab("Croquis", sketchPanel);
+		tabbedPaneContainer.addTab(languageManager.getProperty("main.sketch"), sketchPanel);
 
 		javax.swing.GroupLayout tablePanelLayout = new javax.swing.GroupLayout(tablePanelContainer);
 		tablePanelContainer.setLayout(tablePanelLayout);
@@ -494,7 +508,7 @@ public class MainFrame extends javax.swing.JFrame
 		// tablePanelContainer.revalidate();
 		// tablePanelContainer.repaint();
 
-		tabbedPaneContainer.addTab("Planilla", tablePanelContainer);
+		tabbedPaneContainer.addTab(languageManager.getProperty("main.sheet"), tablePanelContainer);
 
 		middlePanel.add(tabbedPaneContainer);
 
@@ -554,18 +568,18 @@ public class MainFrame extends javax.swing.JFrame
 
 		mainContainerPanel.add(mainPanel, java.awt.BorderLayout.CENTER);
 
-		fileMenu.setText("Archivo");
+		fileMenu.setText(languageManager.getProperty("file"));
 		fileMenu.setRolloverEnabled(false);
 
-		logoutMenuItem.setText("Desloguearse");
+		logoutMenuItem.setText(languageManager.getProperty("logout"));
 		fileMenu.add(logoutMenuItem);
 		logoutMenuItem.addActionListener(this);
 
 		menuBar.add(fileMenu);
 
-		helpMenu.setText("Ayuda");
+		helpMenu.setText(languageManager.getProperty("help"));
 
-		aboutMenuItem.setText("Acerca de");
+		aboutMenuItem.setText(languageManager.getProperty("about"));
 		aboutMenuItem.addActionListener(this);
 		helpMenu.add(aboutMenuItem);
 
@@ -605,7 +619,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	}
 
-	public void restartValues() {
+	public void resetPrivileges() {
 		btnChangePrice.setEnabled(false);
 		btnSeeReports.setEnabled(false);
 	}
@@ -621,14 +635,14 @@ public class MainFrame extends javax.swing.JFrame
 			controller.openChangePriceDialog();
 		} else if (evt.getSource() == btnEnterVehicle) {
 
-			String plateNumber = vPlateNumberTextField.getText().toUpperCase();
-			String vehicle = choiceVehicleComboBox.getSelectedItem().toString();
-			String parkingLot = choiceParkingLotComboBox.getSelectedItem().toString();
+			String type = choiceVehicleComboBox.getSelectedItem().toString();
+			String plate = vPlateTextField.getText().toUpperCase();
+			int spot = Integer.valueOf(choiceParkingLotComboBox.getSelectedItem().toString());
 
-			boolean response = controller.enterVehicle(plateNumber, vehicle, parkingLot);
+			boolean response = controller.enterVehicle(new Vehicle(type, plate, null), spot);
 
 			if (response) {
-				vPlateNumberTextField.setText("");
+				vPlateTextField.setText("");
 			}
 
 		} else if (evt.getSource() == aboutMenuItem) {
@@ -637,15 +651,15 @@ public class MainFrame extends javax.swing.JFrame
 
 	}
 
-	private void buildSketch(ArrayList<ParkingLot> parkingLots) {
+	private void buildSketch(List<ParkingLot> parkingLots) {
 
 		for (int i = 0; i < parkingLots.size(); i++) {
 
-			if (parkingLots.get(i).getVehicle().equals("-")) {
+			if (parkingLots.get(i).getVehicle() == null) {
 				arrayParkingLotLabels.get(i).setIcon(imageIcons.getEmptySpotIcon());
-			} else if (parkingLots.get(i).getVehicle().equals("Automovil")) {
+			} else if (parkingLots.get(i).getVehicle().getType().equals("Car") || parkingLots.get(i).getVehicle().getType().equals("Automovil")) {
 				arrayParkingLotLabels.get(i).setIcon(imageIcons.getCarIcon());
-			} else if (parkingLots.get(i).getVehicle().equals("Motocicleta")) {
+			} else if (parkingLots.get(i).getVehicle().getType().equals("Motorcycle") || parkingLots.get(i).getVehicle().getType().equals("Motocicleta")) {
 				arrayParkingLotLabels.get(i).setIcon(imageIcons.getMotorcycleIcon());
 			}
 
@@ -654,7 +668,7 @@ public class MainFrame extends javax.swing.JFrame
 	}
 
 	@Override
-	public void parkingLotsValueChange(ArrayList<ParkingLot> parkingLots) {
+	public void parkingLotsValueChange(List<ParkingLot> parkingLots) {
 
 		controller.buildVehicleTable(parkingLots);
 		buildSketch(parkingLots);
@@ -713,7 +727,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	@Override
 	public void priceValueChange(String priceValueChange) {
-		priceInfoLbl.setText("Tarifa por hora:        $ " + priceValueChange);
+		priceInfoLbl.setText(languageManager.getProperty("main.price_by_hour") + priceValueChange);
 
 	}
 

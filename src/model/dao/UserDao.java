@@ -1,48 +1,49 @@
 package model.dao;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import controller.Controller;
-import model.domain.User;
-import model.domain.Users;
-import xmlsrc.XMLFilesGenerator;
+import model.dto.User;
+import sqlite.Connect;
 
 public class UserDao implements IUserDao {
 
 	Controller controller;
-	private String usersFilePath = XMLFilesGenerator.getUsersFilePath();
 
-	@Override
-	public ArrayList<User> listUsers() {
-
-		Users users = null;
-		ArrayList<User> usersList = null;
-
-		try {
-			JAXBContext context = JAXBContext.newInstance(Users.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			File file = new File(usersFilePath);
-			users = (Users) unmarshaller.unmarshal(file);
-
-			if (users != null) {
-				usersList = users.getUsers();
-			}
-
-		} catch (JAXBException e) {
-			controller.showErrorMessage("Se encontraron problemas para leer el archivo " + usersFilePath);
-			e.printStackTrace();
-		}
-
-		return usersList;
-	}
+	private Connection conn = null;
+	private Statement st = null;
+	private ResultSet rs = null;
 
 	public void setController(Controller controller) {
 		this.controller = controller;
+
+	}
+
+	public User findUser(String username, String password) {
+
+		User response = null;
+		int idUser;
+		String privilege;
+
+		conn = Connect.getConnection();
+		try {
+			st = conn.createStatement();
+
+			rs = st.executeQuery("SELECT ID, username, privilege FROM user WHERE username='" + username
+					+ "' AND password='" + password + "';");
+			while (rs.next()) {
+				idUser = rs.getInt("ID");
+				privilege = rs.getString("privilege");
+				response = new User(idUser, privilege, username, null);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
+
+		return response;
 
 	}
 

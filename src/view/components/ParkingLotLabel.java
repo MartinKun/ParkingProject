@@ -10,16 +10,14 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.JLabel;
 
-import model.Observable;
-import model.SelectParkingLotObserver;
-import model.domain.ImageIcons;
-
+import helpers.Observable;
+import helpers.SelectParkingLotObserver;
+import model.dto.ImageIcons;
 
 public class ParkingLotLabel extends JLabel implements MouseListener, Observable<SelectParkingLotObserver> {
 
-
 	private static final long serialVersionUID = 1L;
-	
+
 	private int parkingLotNumber;
 	private ArrayList<SelectParkingLotObserver> selectParkingLotsObservers = new ArrayList();
 	ImageIcons imageIcons = new ImageIcons();
@@ -28,19 +26,13 @@ public class ParkingLotLabel extends JLabel implements MouseListener, Observable
 		addMouseListener(this);
 	}
 
-	
-	
 	public int getParkingLotNumber() {
 		return parkingLotNumber;
 	}
 
-
-
 	public void setParkingLotNumber(int parkingLotNumber) {
 		this.parkingLotNumber = parkingLotNumber;
 	}
-
-
 
 	@Override
 	public void mouseClicked(MouseEvent evt) {

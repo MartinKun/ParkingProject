@@ -17,13 +17,16 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import controller.Controller;
-import model.domain.ParkingLot;
-import model.privileges.Privileges;
+import helpers.LanguageManager;
+import model.dto.ParkingLot;
+import model.enums.Privileges;
 
 
 public class DetailPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	private LanguageManager languageManager = LanguageManager.getInstance();
 	
 	private JLabel detailTitleLbl;
 	private JLabel spotLbl;
@@ -62,16 +65,16 @@ public class DetailPanel extends JPanel implements ActionListener {
 		this.controller = controller;
 
 	}
-	
+
 	private void init() {
 
 		detailTitleLbl = new JLabel();
-		detailTitleLbl.setText("Detalle");
+		detailTitleLbl.setText(languageManager.getProperty("detail.title"));
 		detailTitleLbl.setHorizontalAlignment((int) CENTER_ALIGNMENT);
 		detailTitleLbl.setBounds(0, 80, this.getWidth(), 40);
 		detailTitleLbl.setFont(new Font("Verdana", Font.BOLD, 18));
 		this.add(detailTitleLbl);
-
+		
 		separator = new JSeparator();
 		separator.setBounds(0 + 10, detailTitleLbl.getY() + detailTitleLbl.getHeight() + 10, this.getWidth() - 20, 10);
 		this.add(separator);
@@ -107,9 +110,9 @@ public class DetailPanel extends JPanel implements ActionListener {
 				this.getWidth() - 20, 40);
 		totalAmountPayableLbl.setFont(new Font("Verdana", Font.BOLD, 16));
 		this.add(totalAmountPayableLbl);
-
+		
 		btnGenerateTicket = new JButton();
-		btnGenerateTicket.setText("           Cobrar               ");
+		btnGenerateTicket.setText(languageManager.getProperty("detail.get_paid"));
 		btnGenerateTicket.setHorizontalAlignment((int) CENTER_ALIGNMENT);
 		btnGenerateTicket.setBounds(0 + 10, totalAmountPayableLbl.getY() + totalAmountPayableLbl.getHeight() + 35,
 				this.getWidth() - 20, 48);
@@ -120,17 +123,15 @@ public class DetailPanel extends JPanel implements ActionListener {
 		btnGenerateTicket.addActionListener(this);
 
 		btnRemoveVehicle = new JButton();
-		btnRemoveVehicle.setText("Remover de la Planilla");
+		btnRemoveVehicle.setText(languageManager.getProperty("detail.remove_vehicle"));
 		btnRemoveVehicle.setHorizontalAlignment((int) CENTER_ALIGNMENT);
 		btnRemoveVehicle.setBounds(0 + 10, btnGenerateTicket.getY() + btnGenerateTicket.getHeight() + 5,
 				this.getWidth() - 20, 48);
 		btnRemoveVehicle.setFont(new Font("Verdana", Font.BOLD, 16));
 		btnRemoveVehicle
 				.setIcon(new javax.swing.ImageIcon(getClass().getResource("../../resources/images/delete_car.png")));
-		btnRemoveVehicle.setVisible(false);
-		btnRemoveVehicle.addActionListener(this);
-
 		this.add(btnRemoveVehicle);
+		btnRemoveVehicle.addActionListener(this);
 	}
 
 	public void setPrivileges(String userName) {
@@ -148,7 +149,7 @@ public class DetailPanel extends JPanel implements ActionListener {
 
 	}
 
-	public void restartValues() {
+	public void resetPrivileges() {
 		btnRemoveVehicle.setVisible(false);
 	}
 
@@ -156,9 +157,14 @@ public class DetailPanel extends JPanel implements ActionListener {
 
 		this.parkingLotSelected = parkingLotSelected;
 
-		spotLbl.setText("Lugar: " + parkingLotSelected.getSpot() + "");
-		vehicleLbl.setText(parkingLotSelected.getVehicle());
-		plateLbl.setText(parkingLotSelected.getPlate());
+		spotLbl.setText(languageManager.getProperty("spot") + ": " + parkingLotSelected.getSpot() + "");
+		if(parkingLotSelected.getVehicle() != null) {
+			vehicleLbl.setText(parkingLotSelected.getVehicle().getType());
+			plateLbl.setText(parkingLotSelected.getVehicle().getPlate());
+		} else {
+			vehicleLbl.setText("");
+			plateLbl.setText("");
+		}
 
 		controller.displayTimeParkedAndTotalAmountPayable(timeParkedLbl, totalAmountPayableLbl, parkingLotSelected);
 
@@ -170,12 +176,12 @@ public class DetailPanel extends JPanel implements ActionListener {
 		if (evt.getSource() == btnRemoveVehicle) {
 
 			if (parkingLotSelected == null) {
-				controller.showErrorMessage("Primero debe seleccionar el vehiculo que desea quitar.");
-			} else if(parkingLotSelected.getVehicle().equals("-")){
-				controller.showErrorMessage("No hay ningun vehiculo estacionado en ese lugar.");
+				controller.showErrorMessage(languageManager.getProperty("alert.no_vehicle_selected"));
+			} else if(parkingLotSelected.getVehicle() == null){
+				controller.showErrorMessage(languageManager.getProperty("alert.no_vehicle_in_spot"));
 			} else {
 				if(controller.confirmRemoveVehicle()) {
-					boolean response = controller.removeParkingLot(parkingLotSelected);
+					boolean response = controller.removeVehicle(parkingLotSelected.getVehicle(), parkingLotSelected.getSpot());
 					if(response) {
 						controller.restartDetailPanelValues();
 						controller.successVehicleRemovedMessage();
@@ -189,7 +195,7 @@ public class DetailPanel extends JPanel implements ActionListener {
 
 	}
 
-	public void setRestartValues() {
+	public void restartValues() {
 		this.parkingLotSelected = null;
 		totalAmountPayableLbl.setText("");
 		timeParkedLbl.setText("");
@@ -199,5 +205,5 @@ public class DetailPanel extends JPanel implements ActionListener {
 		spotLbl.setText("");
 		
 	}
-
+	
 }

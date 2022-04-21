@@ -1,15 +1,16 @@
 package model.dao;
+import java.util.List;
 
-import java.util.ArrayList;
-
-import model.domain.ParkingLot;
+import model.dto.ParkingLot;
 
 public interface IParkingLotDao {
 	
-	ArrayList<ParkingLot> listParkingLots();
+	List<ParkingLot> listParkingLots();
 	
-	boolean insertParkingLot(ParkingLot parkingLot);
+	ParkingLot findParkingLotById(int id);
 	
-	boolean deleteParkingLot(ParkingLot parkingLot);
+	ParkingLot insertParkingLot(ParkingLot parkingLot);
+	
+	boolean updateParkingLot(ParkingLot parkingLot);
 
 }

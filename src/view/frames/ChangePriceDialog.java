@@ -15,7 +15,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.WindowConstants;
 
 import controller.Controller;
-import model.PriceObserver;
+import helpers.LanguageManager;
+import helpers.PriceObserver;
 
 /**
  *
@@ -29,10 +30,11 @@ public class ChangePriceDialog extends javax.swing.JDialog implements PriceObser
 	private static ChangePriceDialog changePriceDialog;
 	private Controller controller;
 	private String priceValueChange;
+	private LanguageManager languageManager = LanguageManager.getInstance();
 
 	private ChangePriceDialog(java.awt.Frame parent, boolean modal) {
 		super(parent, modal);
-		setTitle("Cambiar Tarifa");
+		setTitle(languageManager.getProperty("change_price"));
 		initComponents();
 		close();
 	}
@@ -73,19 +75,19 @@ public class ChangePriceDialog extends javax.swing.JDialog implements PriceObser
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
 		changePriceLbl.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-		changePriceLbl.setText("Cambiar Tarifa:    $");
+		changePriceLbl.setText(languageManager.getProperty("change_price") + ":    $");
 
 		priceTextField.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
 		priceTextField.addKeyListener(this);
 
 		btnAccept.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		btnAccept.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/check_icon.png"))); // NOI18N
-		btnAccept.setText("Aceptar");
+		btnAccept.setText(languageManager.getProperty("accept"));
 		btnAccept.addActionListener(this);
 
 		btnCancel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/cancel_icon.png"))); // NOI18N
-		btnCancel.setText("Cancelar");
+		btnCancel.setText(languageManager.getProperty("cancel"));
 		btnCancel.addActionListener(this);
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -149,7 +151,7 @@ public class ChangePriceDialog extends javax.swing.JDialog implements PriceObser
 					controller.updatePrice(priceText);
 				}
 			} else {
-				controller.showErrorMessage("Los valores que intenta ingresar no son correctos.");
+				controller.showErrorMessage(languageManager.getProperty("alert.wrong_values"));
 			}
 			
 		} else if (evt.getSource() == btnCancel) {

@@ -1,7 +1,7 @@
 package controller;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -11,14 +11,17 @@ import java.io.File;
 
 import helpers.DateHelper;
 import helpers.DisplayManager;
+import helpers.LanguageManager;
 import model.CashRegistersLogic;
 import model.LoginLogic;
 import model.ParkingLogic;
-import model.domain.CashRegister;
-import model.domain.ParkedVehicleData;
-import model.domain.ParkingLot;
-import model.domain.TimeParked;
-import model.domain.User;
+import model.dto.CashRegister;
+import model.dto.Detail;
+import model.dto.ParkingLot;
+import model.dto.PaymentInformation;
+import model.dto.TimeParked;
+import model.dto.User;
+import model.dto.Vehicle;
 import view.components.DetailPanel;
 import view.frames.AboutDialog;
 import view.frames.ChangePriceDialog;
@@ -35,6 +38,7 @@ public class Controller {
 	private LoginLogic loginLogic;
 	private ParkingLogic parkingLogic;
 	private CashRegistersLogic cashRegistersLogic;
+	private LanguageManager languageManager = LanguageManager.getInstance();
 	private DetailPanel detailPanel;
 	private TablePanel tablePanel;
 	private ReportsDialog reportsDialog;
@@ -65,6 +69,11 @@ public class Controller {
 
 	}
 
+	public void setLanguageManager(LanguageManager languageManager) {
+		this.languageManager = languageManager;
+
+	}
+
 	public void setDetailPanel(DetailPanel detailPanel) {
 		this.detailPanel = detailPanel;
 
@@ -83,10 +92,10 @@ public class Controller {
 	public void setChangePriceDialog(ChangePriceDialog changePriceDialog) {
 		this.changePriceDialog = changePriceDialog;
 	}
-	
+
 	public void setAboutDialog(AboutDialog aboutDialog) {
 		this.aboutDialog = aboutDialog;
-		
+
 	}
 
 	public void setDisplayManager(DisplayManager displayManager) {
@@ -98,18 +107,18 @@ public class Controller {
 		this.getPaidDialog = getPaidDialog;
 	}
 
-	public String validateLogin(String userName, String password) {
+	public String validateUser(User user) {
 		String response = "";
 
-		if (userName.equals("username") || password.equals("password")) {
-			JOptionPane.showMessageDialog(loginDialog, "Debe completar los campos primero.", "Error",
+		if (user.getUsername().equals("username") || user.getPassword().equals("password")) {
+			JOptionPane.showMessageDialog(loginDialog, languageManager.getProperty("alert.empty_fields"), "Error",
 					JOptionPane.WARNING_MESSAGE);
 		} else {
-			User user = loginLogic.validateLogin(userName, password);
+			user = loginLogic.validateUser(user);
 			if (user != null) {
 				response = user.getPrivilege();
 			} else {
-				JOptionPane.showMessageDialog(loginDialog, "Los datos ingresados son incorrectos.", "Error",
+				JOptionPane.showMessageDialog(loginDialog, languageManager.getProperty("alert.wrong_values"), "Error",
 						JOptionPane.WARNING_MESSAGE);
 			}
 		}
@@ -128,15 +137,18 @@ public class Controller {
 	}
 
 	public void logout() {
-		mainFrame.restartValues();
-		detailPanel.restartValues();
+		mainFrame.resetPrivileges();
+		detailPanel.resetPrivileges();
 		reportsDialog.setVisible(false);
 		loginDialog.setVisible(true);
 
 	}
 
 	public void openReportsDialog() {
-		String cashBalancingData = cashRegistersLogic.getCashBalancingData();
+		
+		List<CashRegister> registers = cashRegistersLogic.listCashRegisters();
+		String cashBalancingData = cashRegistersLogic.getCashBalancingData(registers);
+		
 		String vehicleMovementsData = parkingLogic.getVehicleMovementsData();
 		reportsDialog.displayCashBalancingData(cashBalancingData);
 		reportsDialog.displayVehicleMovementsData(vehicleMovementsData);
@@ -148,45 +160,57 @@ public class Controller {
 		changePriceDialog.setVisible(true);
 	}
 
-	public boolean enterVehicle(String plateNumber, String vehicle, String spot) {
+	public boolean enterVehicle(Vehicle vehicle, int spot) {
 
 		boolean response = false;
 
-		if (plateNumber.equals("")) {
+		if (vehicle.getPlate().equals("")) {
 
-			JOptionPane.showMessageDialog(mainFrame, "Debe ingresar el numero de patente del vehiculo,", "Error",
+			JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("alert.empty_plate"), "Error",
 					JOptionPane.WARNING_MESSAGE);
 
 		} else {
 
-			if (vehicle.equals("Tipo de Vehiculo")) {
+			if (vehicle.getType().equals(languageManager.getProperty("main.vehicle_type"))) {
 
-				JOptionPane.showMessageDialog(mainFrame, "Debe especificar el tipo de vehiculo que va a ingresar.",
+				JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("alert.empty_vehicle_type"),
 						"Error", JOptionPane.WARNING_MESSAGE);
 
 			} else {
 
-				if (parkingLogic.validateVehiclePlateNumber(plateNumber)) {
+				if (vehicle.getType().equals("Motocicleta")) {
+					vehicle.setType("Motorcycle");
+				} else if (vehicle.getType().equals("Automovil")) {
+					vehicle.setType("Car");
+				}
 
-					Date actualDate = new Date();
+				if (parkingLogic.validateVehiclePlate(vehicle.getPlate())) {
 
-					ParkingLot parkingLot = new ParkingLot(Integer.valueOf(spot), vehicle, plateNumber,
-							DateHelper.getActualDay(actualDate), DateHelper.getActualHour(actualDate));
+					// Insert the detail with the entry date of the vehicle in the database
+					Detail detail = parkingLogic.insertDetail(new Detail(new Date(), null));
 
-					response = true;
+					// Insert the vehicle data in the database
+					if (detail.getId() != 0) {
+						vehicle.setDetail(detail);
+						vehicle = parkingLogic.insertVehicle(vehicle);
 
-					if (parkingLogic.enterVehicle(parkingLot)) {
-						parkingLogic.insertEnterVehicleRegister(parkingLot);
-						JOptionPane.showMessageDialog(mainFrame, "El vehiculo ha sido ingresado con exito.", "Aviso",
-								JOptionPane.INFORMATION_MESSAGE);
+						if (vehicle.getId() != 0) {
+							// Update the data of the parking slot in which the vehicle has been parked
+							response = parkingLogic.updateParkingSlot(new ParkingLot(spot, spot, vehicle));
+
+							if (response) {
+								parkingLogic.saveVehicleEntryRecord(vehicle, spot);
+								initData();
+								JOptionPane.showMessageDialog(mainFrame,
+										languageManager.getProperty("info.vehicle_enter_success"),
+										languageManager.getProperty("notice"), JOptionPane.INFORMATION_MESSAGE);
+							}
+						}
 					}
 
 				} else {
 
-					JOptionPane.showMessageDialog(mainFrame, "La patente que has ingresado no es valida." + "\n"
-							+ "\nPara que la patente ingresada sea valida debe cumplir con uno de los siguientes formatos:"
-							+ "\n" + "\n- AB 123 CD (Argentina, Venezuela)" + "\n- ABC 1234 (Uruguay)"
-							+ "\n- 123 ABCD (Paraguay)" + "\n- ABC 1D23 (Brasil)" + "\n- AB CD 12 (Chile)", "Error",
+					JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("alert.wrong_plate"), "Error",
 							JOptionPane.WARNING_MESSAGE);
 
 				}
@@ -203,12 +227,12 @@ public class Controller {
 	}
 
 	public void initData() {
-		parkingLogic.initData();
 		parkingLogic.getPriceByHour();
+		parkingLogic.initData();
 
 	}
 
-	public void buildVehicleTable(ArrayList<ParkingLot> parkingLots) {
+	public void buildVehicleTable(List<ParkingLot> parkingLots) {
 		tablePanel.buildTable(parkingLots);
 
 	}
@@ -218,14 +242,14 @@ public class Controller {
 		String message = "";
 
 		if (availableSpotsNumber == 0) {
-			mainFrame.setAvailableSpotsMessage("NO HAY MAS LUGAR", new Color(178, 34, 34));
+			mainFrame.setAvailableSpotsMessage(languageManager.getProperty("no_more_spots"), new Color(178, 34, 34));
 			mainFrame.setEnableEnterVehicleButton(false);
 		} else if (availableSpotsNumber > 0 && availableSpotsNumber <= 3) {
-			message = "Lugares disponibles: " + availableSpotsNumber;
+			message = languageManager.getProperty("available_spots") + availableSpotsNumber;
 			mainFrame.setAvailableSpotsMessage(message, new Color(178, 34, 34));
 			mainFrame.setEnableEnterVehicleButton(true);
 		} else {
-			message = "Lugares disponibles: " + availableSpotsNumber;
+			message = languageManager.getProperty("available_spots") + availableSpotsNumber;
 			mainFrame.setAvailableSpotsMessage(message, new Color(0, 204, 0));
 			mainFrame.setEnableEnterVehicleButton(true);
 		}
@@ -241,7 +265,7 @@ public class Controller {
 
 	public boolean confirmRemoveVehicle() {
 		boolean response = false;
-		int resp = JOptionPane.showConfirmDialog(null, "Estas seguro que quieres quitar el vehiculo de la planilla?");
+		int resp = JOptionPane.showConfirmDialog(null, languageManager.getProperty("confirm.remove_vehicle"));
 		if (JOptionPane.OK_OPTION == resp) {
 			response = true;
 		}
@@ -249,24 +273,39 @@ public class Controller {
 	}
 
 	public void successVehicleRemovedMessage() {
-		JOptionPane.showMessageDialog(mainFrame, "El vehiculo ha sido quitado con exito.", "Aviso",
-				JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("info.remove_vehicle"),
+				languageManager.getProperty("notice"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public boolean confirmGetPaid() {
 		boolean response = false;
-		int resp = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea llevar adelante esta accion?");
+		int resp = JOptionPane.showConfirmDialog(null, languageManager.getProperty("confirm.generic_question"));
 		if (JOptionPane.OK_OPTION == resp) {
 			response = true;
 		}
 		return response;
 	}
 
-	public boolean removeParkingLot(ParkingLot parkingLotSelected) {
-		parkingLogic.insertExitVehicleRegister(parkingLotSelected);
+	public boolean removeVehicle(Vehicle vehicle, int spot) {
 
-		return parkingLogic.removeParkingLot(parkingLotSelected);
+		boolean response = false;
 
+		// Update the detail with the departure date of the vehicle in the database
+		vehicle.getDetail().setDepartureDate(new Date());
+		if (parkingLogic.updateDetail(vehicle.getDetail())) {
+
+			// Set the parking slot to null
+			if (parkingLogic.updateParkingSlot(new ParkingLot(spot, spot, null))) {
+
+				response = parkingLogic.saveVehicleExitRecord(vehicle, spot);
+
+				if (response) {
+					initData();
+				}
+			}
+		}
+
+		return response;
 	}
 
 	public void displayTimeParkedAndTotalAmountPayable(JLabel timeParkedLbl, JLabel totalAmountPayableLbl,
@@ -275,14 +314,15 @@ public class Controller {
 		displayManager.setTimeParkedLbl(timeParkedLbl);
 		displayManager.setTotalAmountPayableLbl(totalAmountPayableLbl);
 
-		if (!parkingLotSelected.getAdmissionDate().equals("-")) {
+		if (parkingLotSelected.getVehicle() != null) {
 			timeParkedLbl.setText("Loading...");
 
 			if (displayManager.isTimerInit) {
 				displayManager.stopTimer();
 			}
-			TimeParked timeParked = DateHelper.getTimeParked(parkingLotSelected.getAdmissionDate(),
-					parkingLotSelected.getAdmissionHour());
+
+			TimeParked timeParked = DateHelper.getTimeParked(parkingLotSelected.getVehicle().getDetail().getEntryDate(),
+					new Date());
 			displayManager.setDays(timeParked.getDay());
 			displayManager.setHours(timeParked.getHour());
 			displayManager.setMinutes(timeParked.getMinutes());
@@ -310,8 +350,7 @@ public class Controller {
 	public boolean confirmChangePrice() {
 		boolean response = false;
 
-		int resp = JOptionPane.showConfirmDialog(null, "Tenga en cuenta que tambien se actualizaran los montos totales "
-				+ "\nde los vehiculos estacionados en este mismo momento." + "\n¿Desea llevar adelante esta accion?");
+		int resp = JOptionPane.showConfirmDialog(null, languageManager.getProperty("confirm.change_price"));
 
 		if (JOptionPane.OK_OPTION == resp) {
 			response = true;
@@ -321,8 +360,8 @@ public class Controller {
 	}
 
 	public void successUpdatePriceMessage() {
-		JOptionPane.showMessageDialog(mainFrame, "Valores Ingresados correctamente", "Aviso",
-				JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("info.change_price_success"),
+				languageManager.getProperty("notice"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void updatePrice(String priceText) {
@@ -332,54 +371,33 @@ public class Controller {
 			changePriceDialog.dispose();
 			successUpdatePriceMessage();
 			restartDetailPanelValues();
-
 		}
 
 	}
 
 	public void openGetPaidDialog(ParkingLot parkingLotSelected) {
-		if (parkingLotSelected == null || parkingLotSelected.getVehicle().equals("-")) {
-			showErrorMessage("Debe seleccionar un vehiculo.");
+		if (parkingLotSelected == null || parkingLotSelected.getVehicle() == null) {
+			showErrorMessage(languageManager.getProperty("alert.no_vehicle_selected"));
 		} else {
-			StringBuilder stringBuilder = new StringBuilder();
-			if (displayManager.getDays() != 0) {
-				stringBuilder.append(displayManager.getDays());
-				stringBuilder.append("dias");
-			}
-			stringBuilder.append(" ");
-			stringBuilder.append(displayManager.getHours());
-			stringBuilder.append("horas");
-			stringBuilder.append(" ");
-			stringBuilder.append(displayManager.getMinutes());
-			stringBuilder.append("min");
-			stringBuilder.append(" ");
-			stringBuilder.append(displayManager.getSeconds());
-			stringBuilder.append("seg");
 
-			ParkedVehicleData ticket = new ParkedVehicleData(parkingLotSelected, stringBuilder.toString(),
-					displayManager.getAmountPayable(), 0);
+			PaymentInformation paymentInformation = new PaymentInformation(displayManager.getAmountPayable(), 0,
+					displayManager.getAmountPayable());
 
-			parkingLogic.setParkedVehicleData(ticket);
-			displayTicketInfo();
-			showTotalAmountPayable();
+			getPaidDialog.setParkingLot(parkingLotSelected);
+			getPaidDialog.setPaymentInformation(paymentInformation);
+			displayTicket();
+
 			getPaidDialog.setVisible(true);
 		}
 
 	}
 
-	public void displayTicketInfo() {
-		String message = parkingLogic.generateMessageTicketInfo();
-		getPaidDialog.displayTicketInfo(message);
+	public void displayTicket() {
+		getPaidDialog.displayTicket();
 	}
 
-	public void showTotalAmountPayable() {
-		ParkedVehicleData parkedVehicleData = parkingLogic.getParkedVehicleData();
-		getPaidDialog.showTotalAmountPayable(parkedVehicleData.getTotalAmountPayable());
-	}
-
-	public void setDiscount(double discount) {
-		parkingLogic.setDiscount(discount);
-		showTotalAmountPayable();
+	public String generateTicket(String type, String plate, Date entryDate, Date departureDate, double partial) {
+		return parkingLogic.generateTicket(type, plate, entryDate, departureDate, partial);
 	}
 
 	public boolean validateDiscountTextField(String discountText) {
@@ -387,66 +405,60 @@ public class Controller {
 		return response;
 	}
 
-	public boolean createCashRegister() {
-
-		boolean response = false;
-
-		if (confirmGetPaid()) {
-			ParkedVehicleData parkedVehicleData = parkingLogic.getParkedVehicleData();
-
-			CashRegister register = cashRegistersLogic.createRegister(parkedVehicleData);
-			response = cashRegistersLogic.addRegister(register);
-
-			if (response) {
-				removeParkingLot(parkedVehicleData.getParkingLot());
-				getPaidDialog.dispose();
-				getPaidDialog.restartValues();
-				restartDetailPanelValues();
-			}
-
-		}
-
-		return response;
-
-	}
-
 	public void restartDetailPanelValues() {
 		displayManager.stopTimer();
-		detailPanel.setRestartValues();
+		detailPanel.restartValues();
 		mainFrame.deselectAllParkingLotLabels();
 	}
 
+	public boolean createCashRegister(ParkingLot parkingLotSelected, PaymentInformation paymentInformation) {
+
+		boolean response = false;
+
+		paymentInformation = cashRegistersLogic.insertPayInformation(paymentInformation);
+
+		if (paymentInformation.getId() != 0) {
+			CashRegister register = new CashRegister(new Date(), parkingLotSelected.getVehicle(), paymentInformation);
+			register = cashRegistersLogic.insertCashRegister(register);
+
+			if (register.getId() != 0) {
+				response = true;
+			}
+		}
+
+		return response;
+	}
+
 	public void successCreateCashRegister() {
-		JOptionPane.showMessageDialog(mainFrame,
-				"El registro ha sido guardado exitosamente.\n"
-						+ "Podra ver los registros guardados en la pantalla de \"Reportes\"  ",
-				"Aviso", JOptionPane.INFORMATION_MESSAGE);
+
+		getPaidDialog.dispose();
+		getPaidDialog.cleanUpResources();
+
+		JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("info.cash_register_saved"),
+				languageManager.getProperty("notice"), JOptionPane.INFORMATION_MESSAGE);
+		restartDetailPanelValues();
 
 	}
 
 	public boolean saveFile(File file, String document) {
-		
+
 		return parkingLogic.saveFile(file, document);
 	}
 
 	public void successSaveFile() {
-		JOptionPane.showMessageDialog(mainFrame,
-				"El archivo ha sido guardado.","Aviso", JOptionPane.INFORMATION_MESSAGE);
-		
+		JOptionPane.showMessageDialog(mainFrame, languageManager.getProperty("info.file_saved"),
+				languageManager.getProperty("notice"), JOptionPane.INFORMATION_MESSAGE);
+
 	}
 
 	public boolean cleanVehicleMovementsFile() {
 		return parkingLogic.cleanVehicleMovementsFile();
-		
-	}
 
-	public boolean cleanCashBalancingFile() {
-		return parkingLogic.cleanCashBalancingFile();
-		
 	}
 
 	public void openAboutDialog() {
 		aboutDialog.setVisible(true);
-		
+
 	}
+
 }

@@ -11,16 +11,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Date;
 
 import javax.swing.WindowConstants;
 
 import controller.Controller;
-
+import helpers.LanguageManager;
+import model.dto.ParkingLot;
+import model.dto.PaymentInformation;
 
 public class GetPaidDialog extends javax.swing.JDialog implements ActionListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private javax.swing.JButton btnAddDiscount;
 	private javax.swing.JLabel discountLbl;
 	private javax.swing.JTextField discountTextField;
@@ -33,6 +36,10 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 	private javax.swing.JLabel totalLbl;
 
 	private Controller controller;
+	private LanguageManager languageManager = LanguageManager.getInstance();
+
+	private ParkingLot parkingLotSelected;
+	private PaymentInformation paymentInformation;
 	private static GetPaidDialog getPaidDialog;
 
 	private GetPaidDialog(java.awt.Frame parent, boolean modal) {
@@ -55,6 +62,30 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 		this.controller = controller;
 	}
 
+	public void setParkingLot(ParkingLot parkingLotSelected) {
+		if (parkingLotSelected != null) {
+			parkingLotSelected.getVehicle().getDetail().setDepartureDate(new Date());
+		}
+		this.parkingLotSelected = parkingLotSelected;
+
+	}
+
+	public void setPaymentInformation(PaymentInformation paymentInformation) {
+		if (paymentInformation != null) {
+			discountTextField.setText(paymentInformation.getDiscount() + "");
+			totalAmountPayableLbl.setText(paymentInformation.getPartial()
+					- (paymentInformation.getDiscount() * paymentInformation.getPartial() / 100) + "");
+		}
+
+		this.paymentInformation = paymentInformation;
+
+	}
+
+	public void updateValues() {
+		discountTextField.setText(paymentInformation.getDiscount() + "");
+		totalAmountPayableLbl.setText(paymentInformation.getTotal() + "");
+	}
+
 	/* Method to close the program when the JDialog Close button is clicked */
 	public void close() {
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -62,7 +93,7 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 			@Override
 			public void windowClosing(WindowEvent e) {
 				dispose();
-				restartValues();
+				cleanUpResources();
 			}
 		});
 	}
@@ -90,7 +121,7 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 		jScrollPane1.setViewportView(ticketTextArea);
 
 		discountLbl.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-		discountLbl.setText("Descuento:");
+		discountLbl.setText(languageManager.getProperty("discount") + ":");
 
 		discountTextField.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		discountTextField.setText("0.00");
@@ -98,7 +129,7 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 		discountTextField.addActionListener(this);
 
 		btnAddDiscount.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-		btnAddDiscount.setText("Agregar ->");
+		btnAddDiscount.setText(languageManager.getProperty("add") + " ->");
 		btnAddDiscount.addActionListener(this);
 
 		totalLbl.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -115,7 +146,7 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 
 		btnGetPaid.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 		btnGetPaid.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/cashier_icon.png")));
-		btnGetPaid.setText("Cobrar");
+		btnGetPaid.setText(languageManager.getProperty("get_paid"));
 		btnGetPaid.addActionListener(this);
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -170,9 +201,13 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
+	public void displayTicket() {
 
-	public void displayTicketInfo(String message) {
-		ticketTextArea.setText(message);
+		String ticket = controller.generateTicket(parkingLotSelected.getVehicle().getType(),
+				parkingLotSelected.getVehicle().getPlate(), parkingLotSelected.getVehicle().getDetail().getEntryDate(),
+				parkingLotSelected.getVehicle().getDetail().getDepartureDate(), paymentInformation.getPartial());
+
+		ticketTextArea.setText(ticket);
 
 	}
 
@@ -187,26 +222,36 @@ public class GetPaidDialog extends javax.swing.JDialog implements ActionListener
 			boolean response = controller.validateDiscountTextField(discountTextField.getText());
 			if (response) {
 				double discount = Double.parseDouble(discountTextField.getText());
-				controller.setDiscount(discount);
+				paymentInformation.setDiscount(discount);
+				paymentInformation.setTotal(paymentInformation.getPartial()
+						- (paymentInformation.getDiscount() * paymentInformation.getPartial() / 100));
+				updateValues();
 			} else {
-				controller.showErrorMessage("El valor ingresado para el descuento es incorrecto."
-						+ "\nEl valor debe estar dentro del rango de 0 a 100. (Puede contener decimales)");
+				controller.showErrorMessage(languageManager.getProperty("alert.wrong_discount"));
 				restartValues();
 			}
 
 		} else if (evt.getSource() == btnGetPaid) {
-			boolean response = controller.createCashRegister();
-			if(response) {
+			 boolean response = controller.createCashRegister(parkingLotSelected, paymentInformation);
+			if (response) {
+				controller.removeVehicle(parkingLotSelected.getVehicle(), parkingLotSelected.getSpot());
 				controller.successCreateCashRegister();
 			} else {
-				controller.showErrorMessage("No se ha podido ingresar el registro.");
+				controller.showErrorMessage(languageManager.getProperty("alert.error_insert_register"));
 			}
 		}
 
 	}
 
 	public void restartValues() {
-		discountTextField.setText("0.00");
+		paymentInformation.setDiscount(0.0);
+		paymentInformation.setTotal(paymentInformation.getPartial());
+		updateValues();
+	}
+	
+	public void cleanUpResources() {
+		setParkingLot(null);
+		setPaymentInformation(null);
 	}
 
 	@Override

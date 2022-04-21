@@ -7,11 +7,16 @@ package view.table.view;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.JTableHeader;
 
 import controller.Controller;
-import model.domain.ParkingLot;
+import helpers.DateHelper;
+import helpers.LanguageManager;
+import model.dto.ParkingLot;
 import view.table.model.GestionTableHeader;
 import view.table.model.TableModel;
 import view.table.model.CellsGestion;
@@ -20,18 +25,20 @@ import view.table.model.CellsGestion;
  *
  * @author conde
  */
-public class TablePanel extends javax.swing.JPanel implements MouseListener{
+public class TablePanel extends javax.swing.JPanel implements MouseListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private LanguageManager languageManager = LanguageManager.getInstance();
+	
 	private Controller controller;
 	private static TablePanel tablePanel;
 
 	private TablePanel() {
 		initComponents();
-
 	}
 
 	public static TablePanel getInstance() {
@@ -76,8 +83,9 @@ public class TablePanel extends javax.swing.JPanel implements MouseListener{
 	private javax.swing.JTable parkedVehiclesTable;
 	// End of variables declaration//GEN-END:variables
 
-	public void buildTable(ArrayList<ParkingLot> parkingLots) {
-		String titles[] = { "Lugar", "Vehiculo", "Patente", "Fecha de Admision", "Hora de Ingreso" };
+	public void buildTable(List<ParkingLot> parkingLots) {
+		String titles[] = { languageManager.getProperty("spot"), languageManager.getProperty("vehicle"), languageManager.getProperty("plate"),
+				languageManager.getProperty("entry_date"), languageManager.getProperty("entry_hour") };
 		String data[][] = getMatriz(parkingLots);
 		TableModel tableModel = new TableModel(data, titles);
 		parkedVehiclesTable.setModel(tableModel);
@@ -107,15 +115,24 @@ public class TablePanel extends javax.swing.JPanel implements MouseListener{
 		jScrollPane1.setViewportView(parkedVehiclesTable);
 	}
 
-	private String[][] getMatriz(ArrayList<ParkingLot> parkingLots) {
+	private String[][] getMatriz(List<ParkingLot> parkingLots) {
+		
 
 		String matrizData[][] = new String[parkingLots.size()][5];
 		for (int i = 0; i < parkingLots.size(); i++) {
 			matrizData[i][0] = parkingLots.get(i).getSpot() + "";
-			matrizData[i][1] = parkingLots.get(i).getVehicle();
-			matrizData[i][2] = parkingLots.get(i).getPlate();
-			matrizData[i][3] = parkingLots.get(i).getAdmissionDate();
-			matrizData[i][4] = parkingLots.get(i).getAdmissionHour();
+			if (parkingLots.get(i).getVehicle() != null) {
+				matrizData[i][1] = parkingLots.get(i).getVehicle().getType();
+				matrizData[i][2] = parkingLots.get(i).getVehicle().getPlate();
+				
+				matrizData[i][3] = DateHelper.formatDateToDay(parkingLots.get(i).getVehicle().getDetail().getEntryDate());
+				matrizData[i][4] = DateHelper.formatDateToHour(parkingLots.get(i).getVehicle().getDetail().getEntryDate());
+			} else {
+				matrizData[i][1] = "";
+				matrizData[i][2] = "";
+				matrizData[i][3] = "";
+				matrizData[i][4] = "";
+			}
 		}
 
 		return matrizData;
@@ -129,34 +146,34 @@ public class TablePanel extends javax.swing.JPanel implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent evt) {
-		if(evt.getSource() == parkedVehiclesTable) {
+		if (evt.getSource() == parkedVehiclesTable) {
 			int parkingLotSelected = parkedVehiclesTable.getSelectedRow();
 			controller.makeSameSelection(parkingLotSelected + 1);
 		}
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

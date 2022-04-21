@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import controller.Controller;
-import txtsrc.TxtFilesManagement;
+import helpers.LanguageManager;
+import txt.TxtFilesManagement;
 
 public class VehicleMovementsDao implements IVehicleMovementsDao{
+	
+	LanguageManager languageManager = LanguageManager.getInstance();
 	
 	private Controller controller;
 	
@@ -40,7 +43,7 @@ public class VehicleMovementsDao implements IVehicleMovementsDao{
 			response = true;
 		} catch (IOException e) {
 			controller.showErrorMessage(
-					"Se encontraron problemas para escribir el archivo " + vehicleMovementsFilePath);
+					languageManager.getProperty("alert.cant_write_file") + "" + vehicleMovementsFilePath);
 			e.printStackTrace();
 		}
 		
@@ -74,11 +77,11 @@ public class VehicleMovementsDao implements IVehicleMovementsDao{
 			
 		} catch (FileNotFoundException e) {
 			controller.showErrorMessage(
-					"No se ha encontrado el archivo " + vehicleMovementsFilePath + ".");
+					languageManager.getProperty("file_not_found") + " " + vehicleMovementsFilePath + ".");
 			e.printStackTrace();
 		} catch (IOException e) {
 			controller.showErrorMessage(
-					"Se encontraron problemas para leer el archivo " + vehicleMovementsFilePath);
+					languageManager.getProperty("alert.cant_read_file") + ""  + vehicleMovementsFilePath);
 			e.printStackTrace();
 		} finally {
 			if(fr != null) {
@@ -86,7 +89,7 @@ public class VehicleMovementsDao implements IVehicleMovementsDao{
 					fr.close();
 				} catch (IOException e) {
 					controller.showErrorMessage(
-							"Se encontraron problemas para leer el archivo " + vehicleMovementsFilePath);
+							languageManager.getProperty("alert.cant_read_file") + ""  + vehicleMovementsFilePath);
 					e.printStackTrace();
 				}
 			}

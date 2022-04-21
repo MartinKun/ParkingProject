@@ -6,11 +6,14 @@
 package view.frames;
 
 import controller.Controller;
+import helpers.LanguageManager;
+import model.dto.User;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -24,7 +27,7 @@ import view.components.InsertUserTextField;
 public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private javax.swing.JButton btnLogin;
 	private javax.swing.JLabel logoParkingLabel;
 	private javax.swing.JPanel loginPane;
@@ -33,6 +36,7 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 	private javax.swing.JTextField userJField;
 	private javax.swing.JPanel userPanel;
 	private Controller controller;
+	private LanguageManager languageManager = LanguageManager.getInstance();
 
 	public void setController(Controller controller) {
 		this.controller = controller;
@@ -62,9 +66,17 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 	private void initComponents() {
 
 		loginPane = new javax.swing.JPanel();
-		userPanel = new view.components.CustomPaintedPanel("../../resources/images/user_plate.png");
+		
+		if(languageManager.getActualLanguage().equals("ES")) {
+			userPanel = new view.components.CustomPaintedPanel("../../resources/images/user_plate_es.png");
+			passwordPanel = new view.components.CustomPaintedPanel("../../resources/images/password_plate_es.png");
+		} else if(languageManager.getActualLanguage().equals("EN")) {
+			userPanel = new view.components.CustomPaintedPanel("../../resources/images/user_plate_en.png");
+			passwordPanel = new view.components.CustomPaintedPanel("../../resources/images/password_plate_en.png");
+		}
+		
 		userJField = new InsertUserTextField();
-		passwordPanel = new view.components.CustomPaintedPanel("../../resources/images/password_plate.png");
+		
 		passwordField = new InsertPasswordTextField();
 		btnLogin = new javax.swing.JButton();
 		logoParkingLabel = new javax.swing.JLabel();
@@ -122,8 +134,8 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 		btnLogin.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
 		btnLogin.setForeground(new java.awt.Color(255, 255, 255));
 		btnLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/login_icon.png"))); // NOI18N
-		btnLogin.setText("  I N G R E S A R");
-		btnLogin.setActionCommand("I N G R E S A R");
+		btnLogin.setText("  " + languageManager.getProperty("enter"));
+		btnLogin.setActionCommand(languageManager.getProperty("enter"));
 		btnLogin.setIconTextGap(2);
 		btnLogin.addActionListener(this);
 
@@ -186,16 +198,15 @@ public class LoginDialog extends javax.swing.JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent evt) {
 		if (evt.getSource() == btnLogin) {
 
-			String response = controller.validateLogin(userJField.getText(),
-					String.valueOf(passwordField.getPassword()));
+			String response = controller
+					.validateUser(new User(null, userJField.getText(), String.valueOf(passwordField.getPassword())));
 
 			if (!response.equals("")) {
 				resetFields();
 				controller.setPrivileges(response);
 				controller.initData();
-				
-			}
 
+			}
 		}
 	}
 

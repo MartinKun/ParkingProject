@@ -1,11 +1,9 @@
 
 package model;
 
-import java.util.ArrayList;
-
 import helpers.Encoder;
 import model.dao.UserDao;
-import model.domain.User;
+import model.dto.User;
 
 public class LoginLogic {
 
@@ -13,25 +11,18 @@ public class LoginLogic {
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
-
 	}
 
-	public User validateLogin(String username, String password) {
+	public User validateUser(User user) {
 
 		User response = null;
-
-		ArrayList<User> users = userDao.listUsers();
-
-		for (User user : users) {
-			if (username.equals(user.getUsername()) && passwordEncoded(password).equals(user.getPassword())) {
-				response = user;
-			}
-		}
+		
+		response = userDao.findUser(user.getUsername(), passwordEncoded(user.getPassword()));
 
 		return response;
 	}
 	
-	public String passwordEncoded(String password) {
+	private String passwordEncoded(String password) {
 		return Encoder.encodePass(password);
 	}
 

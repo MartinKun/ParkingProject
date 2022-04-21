@@ -6,8 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
-import model.PriceObserver;
-
 public class DisplayManager implements PriceObserver{
 	
 	private double priceByHour;

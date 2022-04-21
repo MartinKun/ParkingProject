@@ -1,161 +1,191 @@
 package model.dao;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import java.util.Date;
+import java.util.List;
 
 import controller.Controller;
-import model.domain.ParkingLot;
-import model.domain.ParkingLots;
-import xmlsrc.XMLFilesGenerator;
+import model.dto.Detail;
+import model.dto.ParkingLot;
+import model.dto.Vehicle;
+import sqlite.Connect;
 
 public class ParkingLotDao implements IParkingLotDao {
 
 	Controller controller;
-	private String parkedVehiclesFilePath = XMLFilesGenerator.getParkedVehiclesFilePath();
+	private Connection conn = null;
+	private Statement st = null;
+	private ResultSet rs = null;
+	private PreparedStatement ps = null;
+
+	private String SQL_LIST_PARKING_LOTS = "SELECT p.ID, p.spot, v.ID, v.type, v.plate, d.ID, d.entry_date, d.departure_date FROM parking_lot p "
+			+ "LEFT OUTER JOIN vehicle v ON p.id_vehicle = v.ID " + "LEFT OUTER JOIN detail d ON v.id_detail = d.ID";
+
+	private String SQL_FIND_PARKING_LOT_BY_ID = "SELECT p.ID, p.spot, v.ID, v.type, v.plate, d.ID, d.entry_date, d.departure_date FROM parking_lot p "
+			+ "LEFT OUTER JOIN vehicle v ON p.id_vehicle = v.ID "
+			+ "LEFT OUTER JOIN detail d ON v.id_detail = d.ID WHERE p.ID = ?";
+
+	private String SQL_INSERT_PARKING_LOT = "INSERT INTO parking_lot (spot, id_vehicle) VALUES(?, ?)";
+	private String SQL_UPDATE_PARKING_LOT = "UPDATE parking_lot SET spot = ?, id_vehicle = ? WHERE ID = ?";
 
 	public void setController(Controller controller) {
 		this.controller = controller;
-
 	}
 
 	@Override
-	public ArrayList<ParkingLot> listParkingLots() {
+	public List<ParkingLot> listParkingLots() {
 
-		ParkingLots parkingLots = null;
-		ArrayList<ParkingLot> parkingLotList = null;
-
-		try {
-			JAXBContext context = JAXBContext.newInstance(ParkingLots.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			File file = new File(parkedVehiclesFilePath);
-			parkingLots = (ParkingLots) unmarshaller.unmarshal(file);
-
-			if (parkingLots != null) {
-				parkingLotList = parkingLots.getParkingLots();
-			}
-
-		} catch (JAXBException e) {
-			controller.showErrorMessage("Se encontraron problemas para leer el archivo " + parkedVehiclesFilePath);
-		}
-
-		return parkingLotList;
-	}
-
-	@Override
-	public boolean insertParkingLot(ParkingLot parkingLot) {
-
-		boolean response = false;
-
-		ParkingLots parkingLots = null;
-		ArrayList<ParkingLot> parkingLotList = null;
+		List<ParkingLot> parkingLots = new ArrayList<>();
 
 		try {
-			// Read
-			JAXBContext context = JAXBContext.newInstance(ParkingLots.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			InputStream inputStream = new FileInputStream(parkedVehiclesFilePath);
-			parkingLots = (ParkingLots) unmarshaller.unmarshal(inputStream);
-			inputStream.close();
+			conn = Connect.getConnection();
+			st = conn.createStatement();
+			rs = st.executeQuery(SQL_LIST_PARKING_LOTS);
 
-			// Update
-			if (parkingLots != null) {
-				parkingLotList = parkingLots.getParkingLots();
-			}
-			for (ParkingLot plot : parkingLotList) {
+			while (rs.next()) {
+				int idParkingLot = rs.getInt(1);
+				int spot = rs.getInt(2);
+				int idVehicle = rs.getInt(3);
+				String type = rs.getString(4);
+				String plate = rs.getString(5);
+				int idDetail = rs.getInt(6);
+				Date entryDate = rs.getDate(7);
+				Date departureDate = rs.getDate(8);
 
-				if (plot.getSpot() == parkingLot.getSpot()) {
-					plot.setVehicle(parkingLot.getVehicle());
-					plot.setPlate(parkingLot.getPlate());
-					plot.setAdmissionDate(parkingLot.getAdmissionDate());
-					plot.setAdmissionHour(parkingLot.getAdmissionHour());
-					response = true;
+				if (idVehicle != 0) {
+
+					if (idDetail != 0) {
+						parkingLots.add(new ParkingLot(idParkingLot, spot,
+								new Vehicle(idVehicle, type, plate, new Detail(idDetail, entryDate, departureDate))));
+					} else {
+						parkingLots.add(new ParkingLot(idParkingLot, spot, new Vehicle(idVehicle, type, plate, null)));
+					}
+
+				} else {
+					parkingLots.add(new ParkingLot(idParkingLot, spot, null));
 				}
 
 			}
-			// Write
-			Marshaller marshaller = context.createMarshaller();
-			OutputStream outputStream = new FileOutputStream(parkedVehiclesFilePath);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(parkingLots, outputStream);
-			outputStream.close();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
+		return parkingLots;
+	}
 
-		} catch (JAXBException e) {
-			controller.showErrorMessage(
-					"Se encontraron problemas para leer y escribir el archivo " + parkedVehiclesFilePath);
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			controller.showErrorMessage("El archivo " + parkedVehiclesFilePath + " no ha sido encontrado.");
-			e.printStackTrace();
-		} catch (IOException e) {
-			controller.showErrorMessage(
-					"Se encontraron problemas para leer y escribir el archivo " + parkedVehiclesFilePath);
-			e.printStackTrace();
+	@Override
+	public ParkingLot findParkingLotById(int id) {
+		ParkingLot response = null;
+
+		try {
+			conn = Connect.getConnection();
+			ps = conn.prepareStatement(SQL_FIND_PARKING_LOT_BY_ID);
+			ps.setInt(1, id);
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				int idParkingLot = rs.getInt(1);
+				int spot = rs.getInt(2);
+				int idVehicle = rs.getInt(3);
+				String type = rs.getString(4);
+				String plate = rs.getString(5);
+				int idDetail = rs.getInt(6);
+				Date entryDate = rs.getDate(7);
+				Date departureDate = rs.getDate(8);
+
+				if (idVehicle != 0) {
+
+					if (idDetail != 0) {
+						response = new ParkingLot(idParkingLot, spot,
+								new Vehicle(idVehicle, type, plate, new Detail(idDetail, entryDate, departureDate)));
+					} else {
+						response = new ParkingLot(idParkingLot, spot, new Vehicle(idVehicle, type, plate, null));
+					}
+
+				} else {
+					response = new ParkingLot(idParkingLot, spot, null);
+				}
+
+			}
+			rs.close();
+			st.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
 		}
 		return response;
 	}
 
 	@Override
-	public boolean deleteParkingLot(ParkingLot parkingLot) {
-		
-		boolean response = false;
+	public ParkingLot insertParkingLot(ParkingLot parkingLot) {
 
-		ParkingLots parkingLots = null;
-		ArrayList<ParkingLot> parkingLotList = null;
+		int rowsModified;
+		ParkingLot response = null;
 
 		try {
-			// Read
-			JAXBContext context = JAXBContext.newInstance(ParkingLots.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			InputStream inputStream = new FileInputStream(parkedVehiclesFilePath);
-			parkingLots = (ParkingLots) unmarshaller.unmarshal(inputStream);
-			inputStream.close();
+			conn = Connect.getConnection();
+			ps = conn.prepareStatement(SQL_INSERT_PARKING_LOT, Statement.RETURN_GENERATED_KEYS);
+			ps.setInt(1, parkingLot.getSpot());
 
-			// Update
-			if (parkingLots != null) {
-				parkingLotList = parkingLots.getParkingLots();
+			if (parkingLot.getVehicle() != null) {
+				ps.setInt(2, parkingLot.getVehicle().getId());
+			} else {
+				ps.setNull(2, java.sql.Types.NULL);
 			}
-			for (ParkingLot plot : parkingLotList) {
 
-				if (plot.getSpot() == parkingLot.getSpot()) {
-					plot.setVehicle("-");
-					plot.setPlate("-");
-					plot.setAdmissionDate("-");
-					plot.setAdmissionHour("-");
-					response = true;
+			rowsModified = ps.executeUpdate();
+
+			if (rowsModified > 0) {
+
+				rs = ps.getGeneratedKeys();
+
+				response = parkingLot;
+
+				if (rs.next()) {
+					response.setId(rs.getInt(1));
 				}
-
 			}
-			// Write
-			Marshaller marshaller = context.createMarshaller();
-			OutputStream outputStream = new FileOutputStream(parkedVehiclesFilePath);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(parkingLots, outputStream);
-			outputStream.close();
 
-		} catch (JAXBException e) {
-			controller.showErrorMessage(
-					"Se encontraron problemas para leer y escribir el archivo " + parkedVehiclesFilePath);
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			controller.showErrorMessage("El archivo " + parkedVehiclesFilePath + " no ha sido encontrado.");
-			e.printStackTrace();
-		} catch (IOException e) {
-			controller.showErrorMessage(
-					"Se encontraron problemas para leer y escribir el archivo " + parkedVehiclesFilePath);
-			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
 		}
+
 		return response;
 	}
 
+	@Override
+	public boolean updateParkingLot(ParkingLot parkingLot) {
+
+		int rowsModified;
+		boolean response = false;
+
+		try {
+			conn = Connect.getConnection();
+			ps = conn.prepareStatement(SQL_UPDATE_PARKING_LOT);
+			ps.setInt(1, parkingLot.getSpot());
+
+			if (parkingLot.getVehicle() != null) {
+				ps.setInt(2, parkingLot.getVehicle().getId());
+			} else {
+				ps.setNull(2, java.sql.Types.NULL);
+			}
+
+			ps.setInt(3, parkingLot.getId());
+			
+			rowsModified = ps.executeUpdate();
+
+			if (rowsModified > 0) {
+				response = true;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
+
+		return response;
+	}
 }

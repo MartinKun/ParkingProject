@@ -10,11 +10,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.ResourceBundle;
 
 import javax.swing.JFileChooser;
 
 import controller.Controller;
-import model.privileges.Privileges;
+import helpers.LanguageManager;
+import model.enums.Privileges;
 
 /**
  *
@@ -38,10 +40,12 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 
 	private static ReportsDialog reportsDialog;
 	private Controller controller;
+	
+	private LanguageManager languageManager = LanguageManager.getInstance();
 
 	private ReportsDialog(java.awt.Frame parent, boolean modal) {
 		super(parent, modal);
-		setTitle("Reportes");
+		setTitle(languageManager.getProperty("reports.title"));
 		initComponents();
 	}
 
@@ -128,7 +132,7 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 				.addGroup(jPanel1Layout.createSequentialGroup().addContainerGap().addComponent(jScrollPane1,
 						javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)));
 
-		tabbedPaneReports.addTab("Entrada y salida de vehiculos", jPanel1);
+		tabbedPaneReports.addTab(languageManager.getProperty("vehicle_movements"), jPanel1);
 
 		cashBalancingTxtArea.setBackground(new java.awt.Color(44, 47, 51));
 		cashBalancingTxtArea.setColumns(20);
@@ -146,11 +150,11 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 				.addGroup(jPanel2Layout.createSequentialGroup().addContainerGap().addComponent(jScrollPane3,
 						javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)));
 
-		tabbedPaneReports.addTab("Recaudacion de caja", jPanel2);
+		tabbedPaneReports.addTab(languageManager.getProperty("cash_collection"), jPanel2);
 
 		btnSaveFile.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
 		btnSaveFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/save_file_icon.png"))); // NOI18N
-		btnSaveFile.setText("  Archivar  ");
+		btnSaveFile.setText(languageManager.getProperty("reports.file_saved"));
 		btnSaveFile.setEnabled(false);
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -201,7 +205,7 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 		if (evt.getSource() == btnSaveFile) {
 			if (isFirstPanelShowed == true && isSecondPanelShowed == false) {
 
-				if (fileChooser.showDialog(null, "Guardar") == JFileChooser.APPROVE_OPTION) {
+				if (fileChooser.showDialog(null, languageManager.getProperty("save")) == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
 					if (file.getName().endsWith("txt")) {
 						String document = vehicleMovementsTxtArea.getText();
@@ -211,10 +215,10 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 							controller.cleanVehicleMovementsFile();
 							vehicleMovementsTxtArea.setText("");
 						} else {
-							controller.showErrorMessage("El archivo no pudo ser guardado.");
+							controller.showErrorMessage(languageManager.getProperty("alert.file_cant_be_saved"));
 						}
 					} else {
-						controller.showErrorMessage("Debe ser un documento de texto.");
+						controller.showErrorMessage(languageManager.getProperty("alert.wrong_text_file"));
 					}
 				}
 			} else if (fileChooser.showDialog(null, "Guardar") == JFileChooser.APPROVE_OPTION) {
@@ -224,13 +228,12 @@ public class ReportsDialog extends javax.swing.JDialog implements ActionListener
 					boolean response = controller.saveFile(file, document);
 					if (response) {
 						controller.successSaveFile();
-						controller.cleanCashBalancingFile();
 						cashBalancingTxtArea.setText("");
 					} else {
-						controller.showErrorMessage("El archivo no pudo ser guardado.");
+						controller.showErrorMessage(languageManager.getProperty("alert.file_cant_be_saved"));
 					}
 				} else {
-					controller.showErrorMessage("Debe ser un documento de texto.");
+					controller.showErrorMessage(languageManager.getProperty("alert.wrong_text_file"));
 				}
 			}
 		}

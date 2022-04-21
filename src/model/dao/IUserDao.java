@@ -1,11 +1,9 @@
 package model.dao;
 
-import java.util.ArrayList;
-
-import model.domain.User;
+import model.dto.User;
 
 public interface IUserDao {
-
-	ArrayList<User> listUsers();
+	
+	User findUser(String username, String password);
 	
 }

@@ -1,0 +1,10 @@
+/application/
+/controller/
+/helpers/
+/model/
+/resources/
+/sqlite/
+/txt/
+/view/
+/.classpath
+/.project

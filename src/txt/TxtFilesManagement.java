@@ -33,7 +33,7 @@ public class TxtFilesManagement {
 	}
 
 	private static String getActualDirectory() {
-		File file = new File("./src/txtsrc");
+		File file = new File("./src/txt");
 		String actualDirectory = "";
 		try {
 			actualDirectory = file.getCanonicalPath();
